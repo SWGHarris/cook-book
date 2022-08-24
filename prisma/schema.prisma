@@ -53,6 +53,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    recipes       Recipe[]
 }
 
 model VerificationToken {
@@ -65,5 +66,12 @@ model VerificationToken {
 
 // recipe models
 model Recipe {
-    id String @id @default(cuid())
+    @@map("recipes")
+
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    name String
+    author User @relation(fields: [authorId], references: [id])
+    authorId String 
+    
 }

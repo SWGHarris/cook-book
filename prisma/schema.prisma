@@ -62,3 +62,8 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+// recipe models
+model Recipe {
+    id String @id @default(cuid())
+}

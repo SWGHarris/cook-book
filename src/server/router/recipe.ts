@@ -25,9 +25,9 @@ export const recipeRouter = createRouter()
 
         return next();
     })
-    .mutation("createRecipe", {
+    .mutation("postRecipe", {
         input: z.object({
-            name: z.string(),
+            title: z.string(),
             authorId: z.string()
         }),
 
@@ -35,7 +35,7 @@ export const recipeRouter = createRouter()
             try {
                 await ctx.prisma.recipe.create({
                     data: {
-                    name: input.name,
+                    name: input.title,
                     authorId: input.authorId
                     },
                 });

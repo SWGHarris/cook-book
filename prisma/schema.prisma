@@ -70,7 +70,7 @@ model Recipe {
 
     id Int @id @default(autoincrement())
     createdAt DateTime @default(now())
-    name String
+    title String
     author User @relation(fields: [authorId], references: [id]) // TODO: change User to a public Profile
     authorId String
 }

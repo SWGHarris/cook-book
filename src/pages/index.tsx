@@ -32,7 +32,7 @@ const Home = () => {
     onMutate: () => {
       ctx.cancelQuery(["recipes.getAll"]);
   
-      let optimisticUpdate = ctx.getQueryData(["recipes.getAll"]);
+      const optimisticUpdate = ctx.getQueryData(["recipes.getAll"]);
       if (optimisticUpdate) {
         ctx.setQueryData(["recipes.getAll"], optimisticUpdate);
       }

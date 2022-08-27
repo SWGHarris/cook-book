@@ -9,7 +9,7 @@ export const recipeRouter = createRouter()
             try {
                 return await ctx.prisma.recipe.findMany({
                     select: {
-                        name: true,
+                        title: true,
                     },
                     orderBy: {
                         createdAt: "desc",
@@ -35,7 +35,7 @@ export const recipeRouter = createRouter()
             try {
                 await ctx.prisma.recipe.create({
                     data: {
-                    name: input.title,
+                    title: input.title,
                     authorId: input.authorId
                     },
                 });

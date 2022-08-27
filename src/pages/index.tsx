@@ -13,8 +13,8 @@ const Recipes = () => {
       {recipes?.map((recipe, index) => {
         return (
           <div key={index}>
-            <p>{recipe.name}</p>
-            <span>- {recipe.name}</span>
+            <p>{recipe.title}</p>
+            <span>- {recipe.title}</span>
           </div>
         );
       })}

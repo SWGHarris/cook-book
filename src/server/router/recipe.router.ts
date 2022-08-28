@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { recipeSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
 
@@ -7,30 +7,32 @@ export const recipeRouter = createRouter()
     .query("getAll", {
         async resolve({ ctx }) {
             try {
-                return await ctx.prisma.recipe.findMany({
+                const result = await ctx.prisma.recipe.findMany({
                     select: {
                         title: true,
+                        authorId: true,
                     },
                     orderBy: {
                         createdAt: "desc",
                     },
                 });
+
+                return recipeSchema.array().parse(result);
             } catch (error) {
                 console.log("error", error);
             }
         }
     })
     .middleware(async ({ctx, next}) => {
-        if (!ctx.session) { throw new TRPCError({code: "UNAUTHORIZED"})}
+        if (!ctx.session) { throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Cannot create a new recipe without logging in."
+        })}
 
         return next();
     })
     .mutation("postRecipe", {
-        input: z.object({
-            title: z.string(),
-            authorId: z.string()
-        }),
-
+        input: recipeSchema,
         async resolve({ ctx, input }) {
             try {
                 await ctx.prisma.recipe.create({
@@ -40,7 +42,10 @@ export const recipeRouter = createRouter()
                     },
                 });
             } catch (error) {
-                console.log(error);
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: 'Something went wrong.'
+                })
             }
         },
     });

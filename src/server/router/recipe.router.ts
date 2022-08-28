@@ -11,6 +11,7 @@ export const recipeRouter = createRouter()
                     select: {
                         title: true,
                         authorId: true,
+                        steps: true
                     },
                     orderBy: {
                         createdAt: "desc",
@@ -37,8 +38,13 @@ export const recipeRouter = createRouter()
             try {
                 await ctx.prisma.recipe.create({
                     data: {
-                    title: input.title,
-                    authorId: input.authorId
+                        title: input.title,
+                        authorId: input.authorId,
+                        steps: {
+                            createMany: {
+                                data: input.steps
+                            }
+                        }
                     },
                 });
             } catch (error) {

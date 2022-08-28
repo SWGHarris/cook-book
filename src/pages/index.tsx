@@ -74,7 +74,7 @@ const CreateRecipes = () => {
                 </button>
               </form>
             </div>
-    : <>An error has occured: + error?.message</>
+    : <>"An error has occured: " + error?.message</>
     //TODO: better way to display error please
   );
 }

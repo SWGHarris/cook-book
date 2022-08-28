@@ -4,7 +4,6 @@ import superjson from "superjson";
 import { recipeRouter } from "./recipe.router";
 import { myselfRouter } from "./myself.router";
 
-
 export const appRouter = createRouter()
   .transformer(superjson)
   .merge("recipes.", recipeRouter)

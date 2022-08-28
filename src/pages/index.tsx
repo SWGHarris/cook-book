@@ -14,7 +14,7 @@ const Recipes = () => {
         return (
           <div key={index}>
             <p>{recipe.title}</p>
-            <span>- {recipe.title}</span>
+            <span>- {recipe.authorId}</span>
           </div>
         );
       })}
@@ -22,12 +22,12 @@ const Recipes = () => {
   );
 };
 
-const Home = () => {
+const CreateRecipes = () => {
   const [title, setTitle] = useState("");
-  const { data: session, status } = useSession();
 
   const ctx = trpc.useContext();
-  // const postRecipe = trpc.useMutation("recipes.postRecipe");
+  
+  const { data } = trpc.useQuery(["myself.me"]);
   const postRecipe = trpc.useMutation("recipes.postRecipe",  {
     onMutate: () => {
       ctx.cancelQuery(["recipes.getAll"]);
@@ -42,29 +42,16 @@ const Home = () => {
     },
   });
 
-  if (status === "loading") {
-    return <main className="flex flex-col items-center pt-4">Loading...</main>;
-  }
-
-  return (
-    <main className="flex flex-col items-center">
-      <h1 className="text-3xl pt-4">Recipes</h1>
-
-      <div className="pt-10">
-        {session ? (
-          <div>
-            <p>hi {session.user?.name}</p>
-
-            <button onClick={() => signOut()}>Logout</button>
-            
-            <div className="pt-6">
+  return(
+    data ?
+    <div className="pt-6">
               <form
                 className="flex gap-2"
                 onSubmit={(event) => {
                   event.preventDefault();
 
                   postRecipe.mutate({
-                    authorId: session.user?.id as string,
+                    authorId: data.id,
                     title,
                   });
 
@@ -87,7 +74,33 @@ const Home = () => {
                 </button>
               </form>
             </div>
+    : <>An error has occured: + error?.message</>
+    //TODO: better way to display error please
+  );
+}
+
+const Home = () => {
+  const { data: session, status } = useSession();
+
+  
+
+  if (status === "loading") {
+    return <main className="flex flex-col items-center pt-4">Loading...</main>;
+  }
+
+  return (
+    <main className="flex flex-col items-center">
+      <h1 className="text-3xl pt-4">Recipes</h1>
+
+      <div className="pt-10">
+        {session ? (
+          <div>
+            <p>hi {session.user?.name}</p>
+
+            <button onClick={() => signOut()}>Logout</button>
             
+            <CreateRecipes/>
+
             <div className="pt-10">
               <Recipes />
             </div>

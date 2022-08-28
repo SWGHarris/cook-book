@@ -1,5 +1,4 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import Link from "next/link";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 
@@ -28,7 +27,7 @@ const CreateRecipes = () => {
 
   const ctx = trpc.useContext();
   
-  const { data, error } = trpc.useQuery(["myself.me"]);
+  const { data } = trpc.useQuery(["myself.me"]);
   const postRecipe = trpc.useMutation("recipes.postRecipe",  {
     onMutate: () => {
       ctx.cancelQuery(["recipes.getAll"]);
@@ -75,7 +74,7 @@ const CreateRecipes = () => {
                 </button>
               </form>
             </div>
-    : <>"An error has occured: " + error?.message</>
+    : <>An error has occured: + error?.message</>
     //TODO: better way to display error please
   );
 }

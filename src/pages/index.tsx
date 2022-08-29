@@ -77,7 +77,8 @@ const CreateRecipes = () => {
               </form>
             </div>
               //TODO: better way to display error please
-  );
+);
+return <></>
 }
 
 const Home = () => {

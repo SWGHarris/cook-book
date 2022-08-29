@@ -42,8 +42,8 @@ const CreateRecipes = () => {
     },
   });
 
+  if (data)
   return(
-    data ?
     <div className="pt-6">
               <form
                 className="flex gap-2"
@@ -53,6 +53,8 @@ const CreateRecipes = () => {
                   postRecipe.mutate({
                     authorId: data.id,
                     title,
+                    //TODO: initialize steps of recipe
+                    steps: []
                   });
 
                   setTitle("");
@@ -74,8 +76,7 @@ const CreateRecipes = () => {
                 </button>
               </form>
             </div>
-    : <>"An error has occured: " + error?.message</>
-    //TODO: better way to display error please
+              //TODO: better way to display error please
   );
 }
 

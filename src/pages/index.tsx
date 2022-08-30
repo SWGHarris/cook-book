@@ -20,11 +20,9 @@ const RecipesList = () => {
               ? <>You will add your step now!</>
               : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
             </span>
-            <div>
-            {recipe.steps?.map(step => {
-              return <span>{step.text}</span>;
-            })}
-            </div>
+              {recipe.steps?.map((step, index) => {
+                return <span key={index}>{step.text}</span>;
+              })}
           </div>
         );
       })}

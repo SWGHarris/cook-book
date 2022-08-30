@@ -1,9 +1,11 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+import { RecipeStep } from "../schema/recipe.schema";
 import { trpc } from "../utils/trpc";
 
 // 
-const Recipes = () => {
+const RecipesList = () => {
+  const [showAddStep, setShowAddStep] = useState(false);
   const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
 
   if (isLoading) return <div>Fetching messages...</div>;
@@ -14,13 +16,67 @@ const Recipes = () => {
         return (
           <div key={index}>
             <p>{recipe.title}</p>
-            <span>- {recipe.authorId}</span>
+            <span>{showAddStep
+              ? <>You will add your step now!</>
+              : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
+            </span>
+            {recipe.steps?.map((step) => {
+              return (<span>{step.text}</span>);
+            })}
           </div>
         );
       })}
     </div>
   );
 };
+
+
+interface StepParams {
+  recipeId: number,
+  stepNumber: number
+}
+
+const AddRecipeStep = (p : StepParams) => {
+  const [step, setStep] = useState<RecipeStep>({
+    recipeId: p.recipeId,
+    text: "Step" + p.stepNumber,
+    stepNumber: p.stepNumber
+  });
+  const postRecipeStep = trpc.useMutation(["recipes.postRecipeStep"]);
+
+  return (
+  <div className="pt-6">
+              <form
+                className="flex gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  postRecipeStep.mutate(step);
+                }}
+              >
+                <input
+                  type="text"
+                  value={step.title}
+                  placeholder="Give the step an optional title"
+                  onChange={(event) => setStep({...step, title: event.target.value})}
+                  className="px-4 py-2 rounded-md border-2 border-zinc-800 bg-neutral-900 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  value={step.text}
+                  placeholder="Add a step..."
+                  onChange={(event) => setStep({...step, text: event.target.value})}
+                  className="px-4 py-2 rounded-md border-2 border-zinc-800 bg-neutral-900 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="p-2 rounded-md border-2 border-zinc-800 focus:outline-none"
+                >
+                  Save Step
+                </button>
+              </form>
+            </div>
+  );
+}
 
 const CreateRecipes = () => {
   const [title, setTitle] = useState("");
@@ -104,7 +160,7 @@ const Home = () => {
             <CreateRecipes/>
 
             <div className="pt-10">
-              <Recipes />
+              <RecipesList />
             </div>
           
           </div>

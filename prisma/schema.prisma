@@ -1,6 +1,19 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
+// UPDATING THE DB SCHEMA:
+// Making a modification that does not result in unwanted data loss?
+//      1. Make the change to the schema in this file
+//      2. Push schema additions: npx prisma db push
+//
+// Making a modification that results in unwanted data loss? (i.e. rename column, etc):
+//      1. Make the change to the schema in this file.
+//      2. Create draft SQL file: npx prisma migrate dev --create-only
+//      3. Modify the file and apply with: npx prisma migrate dev
+//
+// more about custom migration: https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/customizing-migrations
+
 generator client {
     provider = "prisma-client-js"
 }
@@ -68,11 +81,24 @@ model VerificationToken {
 
 // recipe models
 model Recipe {
-    @@map("recipes")
+    @@map("recipe")
 
     id Int @id @default(autoincrement())
     createdAt DateTime @default(now())
     title String
-    author User @relation(fields: [authorId], references: [id]) // TODO: change User to a public Profile
+    author User @relation(fields: [authorId], references: [id])
     authorId String
+    desc    String?
+    steps RecipeStep[]
+}
+
+model RecipeStep {
+    @@map("recipe_step")
+
+    id Int @id @default(autoincrement())
+    recipe Recipe @relation(fields: [recipeId], references: [id])
+    recipeId Int
+    stepNumber Int
+    title String?
+    text String
 }

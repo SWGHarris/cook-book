@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
+import { recipeSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
+
 
 export const recipeRouter = createRouter()
     .query("getAll", {
@@ -40,30 +41,6 @@ export const recipeRouter = createRouter()
                         title: input.title,
                         authorId: input.authorId,
                     },
-                });
-            } catch (error) {
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                    message: 'Something went wrong.'
-                })
-            }
-        },
-    })
-    .mutation("postRecipeStep", {
-        input: recipeStepSchema,
-        async resolve({ ctx, input }) {
-            try {
-                await ctx.prisma.recipe.update({
-                    where: { id: input.recipeId },
-                    data: {
-                        steps: {
-                            create: {
-                                stepNumber: input.stepNumber,
-                                title: input.title,
-                                text: input.text
-                            }
-                        }                    
-                    }
                 });
             } catch (error) {
                 throw new TRPCError({

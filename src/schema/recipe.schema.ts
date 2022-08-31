@@ -14,6 +14,7 @@ export const recipeSchema = z.object({
     title: z.string(),
     authorId: z.string(),
     steps: recipeStepSchema.array().optional()
+
 })
 
 export type Recipe = z.infer<typeof recipeSchema>;

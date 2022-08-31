@@ -1,6 +1,9 @@
 import { TRPCError } from "@trpc/server";
+import { type } from "os";
+import { resolve } from "path";
 import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
-import { createRouter } from "./context";
+import { Context, createRouter } from "./context";
+import z from "zod";
 
 export const recipeRouter = createRouter()
     .query("getAll", {
@@ -26,7 +29,7 @@ export const recipeRouter = createRouter()
     .middleware(async ({ctx, next}) => {
         if (!ctx.session) { throw new TRPCError({
             code: "UNAUTHORIZED",
-            message: "Cannot create a new recipe without logging in."
+            message: "Cannot edit recipe without logging in."
         })}
 
         return next();
@@ -65,6 +68,25 @@ export const recipeRouter = createRouter()
                         }                    
                     }
                 });
+            } catch (error) {
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: 'Something went wrong.'
+                })
+            }
+        },
+    })
+    .mutation("deleteRecipe", {
+        input: recipeSchema.pick({id: true}),
+        async resolve({ ctx, input }) {
+            const deleteSteps = ctx.prisma.recipeStep.deleteMany({
+                where: {recipeId: input.id}
+            });
+            const deleteRecipe = ctx.prisma.recipe.delete({
+                where: {id: input.id}
+            });
+            try {
+                await ctx.prisma.$transaction([deleteSteps, deleteRecipe]);
             } catch (error) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { RecipeStep } from "../schema/recipe.schema";
 import { trpc } from "../utils/trpc";
 
-// 
 const RecipesList = () => {
   const [showAddStep, setShowAddStep] = useState(false);
   const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
@@ -20,9 +19,9 @@ const RecipesList = () => {
               ? <>You will add your step now!</>
               : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
             </span>
-              {recipe.steps?.map((step, index) => {
-                return <span key={index}>{step.text}</span>;
-              })}
+            {recipe.steps?.map((step, index) => {
+              return <span key={index}>{step.text}</span>;
+            })}
           </div>
         );
       })}
@@ -35,7 +34,7 @@ interface StepParams {
   stepNumber: number
 }
 
-const AddRecipeStep = (p : StepParams) => {
+const CreateRecipeStep = (p : StepParams) => {
   const [step, setStep] = useState<RecipeStep>({
     recipeId: p.recipeId,
     text: "Step" + p.stepNumber,
@@ -79,9 +78,7 @@ const AddRecipeStep = (p : StepParams) => {
 
 const CreateRecipes = () => {
   const [title, setTitle] = useState("");
-
   const ctx = trpc.useContext();
-  
   const { data } = trpc.useQuery(["myself.me"]);
   const postRecipe = trpc.useMutation("recipes.postRecipe",  {
     onMutate: () => {
@@ -108,8 +105,6 @@ const CreateRecipes = () => {
                   postRecipe.mutate({
                     authorId: data.id,
                     title,
-                    //TODO: initialize steps of recipe
-                    steps: []
                   });
 
                   setTitle("");
@@ -132,16 +127,12 @@ const CreateRecipes = () => {
                 </button>
               </form>
             </div>
-              //TODO: better way to display error please
 );
-return <></>
-
+return <></> //TODO: return loading state?
 }
 
 const Home = () => {
   const { data: session, status } = useSession();
-
-  
 
   if (status === "loading") {
     return <main className="flex flex-col items-center pt-4">Loading...</main>;

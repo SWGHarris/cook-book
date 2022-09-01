@@ -10,7 +10,7 @@ export const recipeStepSchema = z.object({
 export type RecipeStep = z.infer<typeof recipeStepSchema>;
 
 export const recipeSchema = z.object({
-    id : z.number().optional(),
+    id : z.number().int().nonnegative(),
     title: z.string(),
     authorId: z.string(),
     steps: recipeStepSchema.array().optional()

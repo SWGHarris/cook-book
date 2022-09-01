@@ -3,10 +3,23 @@ import { useState } from "react";
 import { RecipeStep } from "../schema/recipe.schema";
 import { trpc } from "../utils/trpc";
 
-// 
 const RecipesList = () => {
   const [showAddStep, setShowAddStep] = useState(false);
   const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
+  const ctx = trpc.useContext();
+  const deletRecipe = trpc.useMutation(["recipes.deleteRecipe"], {
+    onMutate: () => {
+      ctx.cancelQuery(["recipes.getAll"]);
+  
+      const optimisticUpdate = ctx.getQueryData(["recipes.getAll"]);
+      if (optimisticUpdate) {
+        ctx.setQueryData(["recipes.getAll"], optimisticUpdate);
+      }
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["recipes.getAll"]);
+    },
+  });
 
   if (isLoading) return <div>Fetching messages...</div>;
 
@@ -16,13 +29,16 @@ const RecipesList = () => {
         return (
           <div key={index}>
             <p>{recipe.title}</p>
-            <span>{showAddStep
-              ? <>You will add your step now!</>
-              : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
-            </span>
-              {recipe.steps?.map((step, index) => {
-                return <span key={index}>{step.text}</span>;
-              })}
+            <div>
+              {/* <span>{showAddStep
+                ? <>You will add your step now!</>
+                : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
+              </span> */}
+              <span><button onClick={() => {deletRecipe.mutate({ id: recipe.id })}}>DELETE RECIPE</button></span>
+            </div>
+            {/* {recipe.steps?.map((step, index) => {
+              return <span key={index}>{step.text}</span>;
+            })} */}
           </div>
         );
       })}
@@ -35,7 +51,7 @@ interface StepParams {
   stepNumber: number
 }
 
-const AddRecipeStep = (p : StepParams) => {
+const CreateRecipeStep = (p : StepParams) => {
   const [step, setStep] = useState<RecipeStep>({
     recipeId: p.recipeId,
     text: "Step" + p.stepNumber,
@@ -79,9 +95,7 @@ const AddRecipeStep = (p : StepParams) => {
 
 const CreateRecipes = () => {
   const [title, setTitle] = useState("");
-
   const ctx = trpc.useContext();
-  
   const { data } = trpc.useQuery(["myself.me"]);
   const postRecipe = trpc.useMutation("recipes.postRecipe",  {
     onMutate: () => {
@@ -108,8 +122,6 @@ const CreateRecipes = () => {
                   postRecipe.mutate({
                     authorId: data.id,
                     title,
-                    //TODO: initialize steps of recipe
-                    steps: []
                   });
 
                   setTitle("");
@@ -132,16 +144,12 @@ const CreateRecipes = () => {
                 </button>
               </form>
             </div>
-              //TODO: better way to display error please
 );
-return <></>
-
+return <></> //TODO: return loading state?
 }
 
 const Home = () => {
   const { data: session, status } = useSession();
-
-  
 
   if (status === "loading") {
     return <main className="flex flex-col items-center pt-4">Loading...</main>;

@@ -6,6 +6,20 @@ import { trpc } from "../utils/trpc";
 const RecipesList = () => {
   const [showAddStep, setShowAddStep] = useState(false);
   const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
+  const ctx = trpc.useContext();
+  const deletRecipe = trpc.useMutation(["recipes.deleteRecipe"], {
+    onMutate: () => {
+      ctx.cancelQuery(["recipes.getAll"]);
+  
+      const optimisticUpdate = ctx.getQueryData(["recipes.getAll"]);
+      if (optimisticUpdate) {
+        ctx.setQueryData(["recipes.getAll"], optimisticUpdate);
+      }
+    },
+    onSettled: () => {
+      ctx.invalidateQueries(["recipes.getAll"]);
+    },
+  });
 
   if (isLoading) return <div>Fetching messages...</div>;
 
@@ -15,13 +29,16 @@ const RecipesList = () => {
         return (
           <div key={index}>
             <p>{recipe.title}</p>
-            <span>{showAddStep
-              ? <>You will add your step now!</>
-              : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
-            </span>
-            {recipe.steps?.map((step, index) => {
+            <div>
+              {/* <span>{showAddStep
+                ? <>You will add your step now!</>
+                : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
+              </span> */}
+              <span><button onClick={() => {deletRecipe.mutate({ id: recipe.id })}}>DELETE RECIPE</button></span>
+            </div>
+            {/* {recipe.steps?.map((step, index) => {
               return <span key={index}>{step.text}</span>;
-            })}
+            })} */}
           </div>
         );
       })}

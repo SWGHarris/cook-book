@@ -1,26 +1,19 @@
 import { TRPCError } from "@trpc/server";
-import { type } from "os";
-import { resolve } from "path";
+import { z } from "zod";
 import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
-import { Context, createRouter } from "./context";
-import z from "zod";
+import { createRouter } from "./context";
 
 export const recipeRouter = createRouter()
     .query("getAll", {
+        output: recipeSchema.omit({steps: true}).array().optional(),
         async resolve({ ctx }) {
             try {
-                const result = await ctx.prisma.recipe.findMany({
-                    select: {
-                        title: true,
-                        authorId: true,
-                        steps: true
-                    },
+                const r = await ctx.prisma.recipe.findMany({
                     orderBy: {
                         createdAt: "desc",
                     },
                 });
-
-                return recipeSchema.array().parse(result);
+                return r;
             } catch (error) {
                 console.log("error", error);
             }
@@ -35,7 +28,8 @@ export const recipeRouter = createRouter()
         return next();
     })
     .mutation("postRecipe", {
-        input: recipeSchema,
+        // omission of id seems like a solution to keep id non-optional on zod object
+        input: recipeSchema.omit({id: true}),
         async resolve({ ctx, input }) {
             try {
                 await ctx.prisma.recipe.create({

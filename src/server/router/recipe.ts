@@ -33,7 +33,7 @@ export const recipeRouter = createRouter()
 
         async resolve({ ctx, input }) {
             try {
-                await ctx.prisma.recipe.create({
+                return await ctx.prisma.recipe.create({
                     data: {
                     title: input.title,
                     authorId: input.authorId

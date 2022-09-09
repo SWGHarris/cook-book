@@ -29,9 +29,10 @@ export const recipeRouter = createRouter()
     .mutation("postRecipe", {
         // omission of id seems like a solution to keep id non-optional on zod object
         input: recipeSchema.omit({id: true}),
+        output: recipeSchema,
         async resolve({ ctx, input }) {
             try {
-                await ctx.prisma.recipe.create({
+                return await ctx.prisma.recipe.create({
                     data: {
                         title: input.title,
                         authorId: input.authorId,

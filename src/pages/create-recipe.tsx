@@ -98,6 +98,7 @@ const CreateRecipe = () => {
                 {steps.map((_, index) => {
                   return(
                   <textarea 
+                  key={index}
                   rows={5} 
                   cols={45} 
                   minLength={1}

@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { trpc } from "../utils/trpc";
 import CreateRecipe from "./create-recipe";
 
@@ -55,9 +56,15 @@ const Home = () => {
         {session && (
           <div>
             <h1>Welcome {session.user?.name}</h1>
-            <CreateRecipe/>
+            <div className="pt-3"></div>
+            <Link href={'/create-recipe'}>
+                <a className="btn p-2 rounded-md border-2 border-zinc-800 focus:outline-none">Create Recipe</a>
+            </Link>
+            <div className="pt-3"></div>
+              <h2>Browse Recipes</h2>
             <div className="pt-10">
               <RecipesList />
+              {/* TODO: make recipes pageable as cards or as table (see daisy ui) */}
             </div>
           </div>
         )}

@@ -25,7 +25,6 @@ const Home = () => {
             <div className="pt-3"></div>
             <div className="pt-8">
               <RecipeTable />
-              {/* TODO: make recipes pageable as cards or as table (see daisy ui) */}
             </div>
           </div>
         )}

@@ -65,7 +65,7 @@ const RecipeTable:FC = () => {
         <tbody>
             {recipes?.map((recipe, index) => {
                 return (
-                <tr className="hover">
+                <tr className="hover" key={index}>
                     <th>{index + 1}</th>
                     <td>{recipe.title}</td>
                     <td>{recipe.authorId}</td>
@@ -85,11 +85,6 @@ const RecipeTable:FC = () => {
         </tbody>
     </table>
     </div>
-
 )}
 
 export default RecipeTable;
-
-function without(selected: number[], arg1: number): import("react").SetStateAction<number[]> {
-    throw new Error("Function not implemented.");
-}

@@ -95,7 +95,7 @@ const CreateRecipe = () => {
                   onChange={(event) => setTitle(event.target.value)}
                   className="bg-inherit border-violet-500 border-2 rounded-lg h-10"
                 />
-                {steps.map((_, index) => {
+                {steps.map((step, index) => {
                   return(
                   <textarea 
                   key={index}
@@ -103,7 +103,7 @@ const CreateRecipe = () => {
                   cols={45} 
                   minLength={1}
                   maxLength={400}
-                  // value={step}
+                  value={step}
                   placeholder="What comes next?"
                   onChange={(event) => {
                     event.preventDefault();

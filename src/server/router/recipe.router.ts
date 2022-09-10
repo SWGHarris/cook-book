@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
@@ -70,14 +71,22 @@ export const recipeRouter = createRouter()
             }
         },
     })
-    .mutation("deleteRecipe", {
-        input: recipeSchema.pick({id: true}),
+    .mutation("deleteRecipes", {
+        input: recipeSchema.shape.id.array(),
         async resolve({ ctx, input }) {
             const deleteSteps = ctx.prisma.recipeStep.deleteMany({
-                where: {recipeId: input.id}
+                where: {
+                    recipeId: {
+                        in: input
+                    }
+                }
             });
-            const deleteRecipe = ctx.prisma.recipe.delete({
-                where: {id: input.id}
+            const deleteRecipe = ctx.prisma.recipe.deleteMany({
+                where: {
+                    id: {
+                        in: input
+                    }
+                }
             });
             try {
                 await ctx.prisma.$transaction([deleteSteps, deleteRecipe]);

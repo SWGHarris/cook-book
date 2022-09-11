@@ -1,35 +1,8 @@
 
+import Link from "next/link";
 import { FC, useState } from "react";
 import { Recipe } from "../schema/recipe.schema";
 import { trpc } from "../utils/trpc";
-// const RecipesList = () => {
-    
-//     return (
-//       <div className="flex flex-col gap-4">
-//         {recipes?.map((recipe, index) => {
-//           return (
-//             <div key={index}>
-//               <p>{recipe.title}</p>
-//               <div>
-//                 {/* <span>{showAddStep
-//                   ? <>You will add your step now!</>
-//                   : <button onClick={() => {setShowAddStep(!showAddStep)}}>click to add step</button>}
-//                 </span> */}
-//                 <span>
-//                   <button >
-//                   DELETE RECIPE
-//                   </button>
-//                 </span>
-//               </div>
-//               {/* {recipe.steps?.map((step, index) => {
-//                 return <span key={index}>{step.text}</span>;
-//               })} */}
-//             </div>
-//           );
-//         })}
-//       </div>
-//     );
-//   };
 
 const RecipeTable:FC = () => {
     const ctx = trpc.useContext();
@@ -42,20 +15,21 @@ const RecipeTable:FC = () => {
     if (isLoading) return <div>Fetching recipes...</div>;
 
     return (
-
-    <div className="overflow-x-auto border-2 border-sky-900 rounded-xl">
-    <table className="table w-fit ">
-        <thead>
+    <div className="flex-col grow">
+    <h1>Browse Recipes</h1>
+    <div className="overflow-auto rounded-lg shadow-lg">
+    {/* // <div className="overflow-x-auto border-2 border-sky-900 rounded-xl"> */}
+    <table className="w-full">
+        <thead className=" bg-slate-600">
         <tr>
-            <th></th>
-            <th>Recipe</th>
-            <th>Author</th>
-            <th>Category</th>
+            <th className="p-3 text-base font-semibold tracking-wide text-left">Recipe</th>
+            <th className="p-3 text-base font-semibold tracking-wide text-left">Author</th>
+            <th className="p-3 text-base font-semibold tracking-wide text-left">Category</th>
 
             <th>
                 {deleteRecipe.isLoading
-                ? <button className="btn btn-square loading"></button>
-                : <button className="btn btn-square btn-outline"
+                ? <button className="btn btn-square loading m-2 btn-sm"></button>
+                : <button className="btn btn-square btn-outline m-2 btn-sm"
                         onClick={(event) => {
                             event.preventDefault();
                             deleteRecipe.mutate(Array.from(selected.keys()));
@@ -67,15 +41,16 @@ const RecipeTable:FC = () => {
             </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-500">
             {recipes?.map((recipe, index) => {
+                const altColor = (index%2 ===0) ? " bg-slate-700 " : "";
                 return (
-                <tr className="hover" key={index}>
-                    <th>{index + 1}</th>
-                    <td>{recipe.title}</td>
-                    <td>{recipe.authorId}</td>
-                    <td>Frozen Food</td>
-                    <td>
+                <tr className={altColor} key={index}>
+                    <td className="p-3 text-base font-bold text-sky-700 hover:underline"><Link href="" className="font-bold">{recipe.title}</Link></td>
+                    <td className="p-3 text-base text-ellipsis overflow-hidden">Sam Harris</td>
+                    {/* TODO: add author name to recipe schema */}
+                    <td className="p-3 text-base ">Frozen Food</td>
+                    <td className="p-3">
                         <label>
                             <input 
                                 type="checkbox" 
@@ -89,6 +64,7 @@ const RecipeTable:FC = () => {
             })}
         </tbody>
     </table>
+    </div>
     </div>
 )}
 

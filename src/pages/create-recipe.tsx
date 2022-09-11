@@ -107,7 +107,7 @@ const CreateRecipe = () => {
                   placeholder="What comes next?"
                   onChange={(event) => {
                     event.preventDefault();
-                    setSteps(steps.map((s, i) => { return (i === index) ? event.target.value : s }));
+                    setSteps(steps.map((s, i) => (i === index) ? event.target.value : s ));
                   }
                   } 
                   className="bg-inherit border-cyan-900 border-2 rounded-lg"

@@ -105,10 +105,10 @@ const CreateRecipe:FC = () => {
                 />
                 {steps.map((step, index) =>
 
-                  <div>
+                  <div key={index}>
 
                   <textarea
-                  className="w-full bg-slate-600 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="w-full bg-slate-600 p-2 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   key={index}
                   minLength={1}
                   maxLength={400}

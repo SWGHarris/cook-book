@@ -18,7 +18,7 @@ const RecipeTableMobile:FC = () => {
     return (
         <div className="grid grid-cols-1 gap-4">
             {recipes?.map((recipe, index) => 
-                <div className="bg-gray-800 space-y-2 p-4 rounded-lg shadow">
+                <div key={index} className="bg-gray-800 space-y-2 p-4 rounded-lg shadow">
                     <div className="flex items-center space-x-2 text-sm">
                         <div className="font-bold text-sky-700 hover:underline"><Link href="" >{recipe.title}</Link></div>
                         <div>Sam Harris</div>
@@ -38,7 +38,6 @@ const RecipeTableMobile:FC = () => {
                             <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>
                             <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-gray-200 bg-gray-200 rounded-lg bg-opacity-50">easy</div>
                     </div>
-                    
                 </div>
             )}                    
         </div>

@@ -16,23 +16,24 @@ const RecipeTableMobile:FC = () => {
     if (isLoading) return <div>Fetching recipes...</div>;
 
     return (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-2">
             {recipes?.map((recipe, index) => 
-                <div key={index} className="bg-gray-800 space-y-2 p-4 rounded-lg shadow">
-                    <div className="flex items-center space-x-2 text-sm">
+                <div key={index} className="bg-gray-800 space-y-1 p-3 rounded-lg shadow">
+                    <div className="flex items-stretch space-x-2 text-sm">
                         <div className="font-bold text-sky-700 hover:underline"><Link href="" >{recipe.title}</Link></div>
                         <div>Sam Harris</div>
                         <div className="text-gray-500">9/12/2022</div>
                         <div>
-                        <input 
-                            type="checkbox" 
-                            className="checkbox" 
-                            checked={selected.get(recipe.id)} 
-                            onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))
-                            }}
-                        />
+                            <input 
+                                type="checkbox" 
+                                className="checkbox" 
+                                checked={selected.get(recipe.id)} 
+                                onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))
+                                }}
+                            />
+                        </div>
                     </div>
-                    </div>
+
                     <div className="text-sm font-medium text-gray-400 w-2/3">A very brief description that is about this long.</div>
                     <div className="flex gap-2">
                             <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>

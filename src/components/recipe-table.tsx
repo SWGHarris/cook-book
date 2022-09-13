@@ -15,16 +15,15 @@ const RecipeTable:FC = () => {
     if (isLoading) return <div>Fetching recipes...</div>;
 
     return (
-    <div className="flex-col grow">
-    <h1>Browse Recipes</h1>
-    <div className="overflow-auto rounded-lg shadow-lg">
-    {/* // <div className="overflow-x-auto border-2 border-sky-900 rounded-xl"> */}
-    <table className="w-full">
+
+        <div className="overflow-auto">
+        <table className="flex-col items-start pt-4 w-screen max-w-prose">
+        <caption>Browse Recipes</caption>
         <thead className=" bg-slate-600">
         <tr>
-            <th className="p-3 text-base font-semibold tracking-wide text-left">Recipe</th>
-            <th className="p-3 text-base font-semibold tracking-wide text-left">Author</th>
-            <th className="p-3 text-base font-semibold tracking-wide text-left">Category</th>
+            <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Recipe</th>
+            <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Author</th>
+            <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Category</th>
 
             <th>
                 {deleteRecipe.isLoading
@@ -47,8 +46,7 @@ const RecipeTable:FC = () => {
                 return (
                 <tr className={altColor} key={index}>
                     <td className="p-3 text-base font-bold text-sky-700 hover:underline"><Link href="" className="font-bold">{recipe.title}</Link></td>
-                    <td className="p-3 text-base text-ellipsis overflow-hidden">Sam Harris</td>
-                    {/* TODO: add author name to recipe schema */}
+                    <td className="p-3 text-base text-ellipsis">Sam Harris</td>
                     <td className="p-3 text-base ">Frozen Food</td>
                     <td className="p-3">
                         <label>
@@ -64,7 +62,6 @@ const RecipeTable:FC = () => {
             })}
         </tbody>
     </table>
-    </div>
     </div>
 )}
 

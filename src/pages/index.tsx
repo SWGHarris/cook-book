@@ -1,8 +1,7 @@
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import RecipeTable from "../components/recipe-table";
-import { trpc } from "../utils/trpc";
-import CreateRecipe from "./create-recipe";
+import RecipeTableMobile from "../components/recipe-table-mobile";
 
 const Home = () => {
   const { data: session, status } = useSession();
@@ -24,7 +23,7 @@ const Home = () => {
             </Link>
             <div className="pt-3"></div>
             <div className="pt-8">
-              <RecipeTable />
+              <RecipeTableMobile />
             </div>
           </div>
         )}

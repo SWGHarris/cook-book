@@ -21,6 +21,8 @@ const RecipeTableMobile:FC = () => {
             {deleteRecipe.isLoading
                 ? <button className="btn btn-square loading btn-xs"></button>
                 : <button className="btn btn-square btn-outline btn-xs"
+                        // TODO: need to prevent unselected from getting deleted (selected then unselected are still in list)
+                        // TODO: abstract out the handler for deleting(or other action)
                         onClick={(event) => {
                             event.preventDefault();
                             deleteRecipe.mutate(Array.from(selected.keys()));
@@ -57,48 +59,7 @@ const RecipeTableMobile:FC = () => {
                 </div>
             )}                    
             </div>
-
         </div>
-        
-
-    //     <div className="overflow-auto">
-    //     <table className="flex-col items-start pt-4 w-screen max-w-prose">
-    //     <caption>Browse Recipes (mobile)</caption>
-    //     <thead className=" bg-slate-600">
-    //     <tr>
-    //         <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Recipe</th>
-    //         <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Author</th>
-    //         <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Category</th>
-
-    //         <th>
-    //            
-                
-    //         </th>
-    //     </tr>
-    //     </thead>
-    //     <tbody className="divide-y divide-gray-500">
-    //         {recipes?.map((recipe, index) => {
-    //             const altColor = (index%2 ===0) ? " bg-slate-700 " : "";
-    //             return (
-    //             <tr className={altColor} key={index}>
-    //                 <td className="p-3 text-base font-bold text-sky-700 hover:underline"><Link href="" className="font-bold">{recipe.title}</Link></td>
-    //                 <td className="p-3 text-base text-ellipsis">Sam Harris</td>
-    //                 <td className="p-3 text-base ">Frozen Food</td>
-    //                 <td className="p-3">
-    //                     <label>
-    //                         <input 
-    //                             type="checkbox" 
-    //                             className="checkbox" 
-    //                             checked={selected.get(recipe.id)} 
-    //                             onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))
-    //                             }}/>
-    //                     </label>
-    //                 </td>
-    //             </tr>);
-    //         })}
-    //     </tbody>
-    // </table>
-    // </div>
 )}
 
 export default RecipeTableMobile;

@@ -16,13 +16,28 @@ const RecipeTableMobile:FC = () => {
     if (isLoading) return <div>Fetching recipes...</div>;
 
     return (
-        <div className="grid grid-cols-1 gap-2">
+        <div className="flex flex-col">
+            <div className="flex flex-row-reverse space-y-1 p-0">
+            {deleteRecipe.isLoading
+                ? <button className="btn btn-square loading btn-xs"></button>
+                : <button className="btn btn-square btn-outline btn-xs"
+                        onClick={(event) => {
+                            event.preventDefault();
+                            deleteRecipe.mutate(Array.from(selected.keys()));
+                        }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                }
+            </div>
+            <div className="p-1"></div>
+            <div className="grid grid-cols-1 gap-1">
             {recipes?.map((recipe, index) => 
                 <div key={index} className="bg-gray-800 space-y-1 p-3 rounded-lg shadow">
                     <div className="flex items-stretch space-x-2 text-sm">
                         <div className="font-bold text-sky-700 hover:underline"><Link href="" >{recipe.title}</Link></div>
                         <div>Sam Harris</div>
                         <div className="text-gray-500">9/12/2022</div>
+                        <span className=" grow"></span>
                         <div>
                             <input 
                                 type="checkbox" 
@@ -41,25 +56,10 @@ const RecipeTableMobile:FC = () => {
                     </div>
                 </div>
             )}                    
+            </div>
+
         </div>
-    //             const altColor = (index%2 ===0) ? " bg-slate-700 " : "";
-    //             return (
-    //             <tr className={altColor} key={index}>
-    //                 <td className="p-3 text-base font-bold text-sky-700 hover:underline"><Link href="" className="font-bold">{recipe.title}</Link></td>
-    //                 <td className="p-3 text-base text-ellipsis">Sam Harris</td>
-    //                 <td className="p-3 text-base ">Frozen Food</td>
-    //                 <td className="p-3">
-    //                     <label>
-    //                         <input 
-    //                             type="checkbox" 
-    //                             className="checkbox" 
-    //                             checked={selected.get(recipe.id)} 
-    //                             onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))
-    //                             }}/>
-    //                     </label>
-    //                 </td>
-    //             </tr>);
-    //         })}
+        
 
     //     <div className="overflow-auto">
     //     <table className="flex-col items-start pt-4 w-screen max-w-prose">
@@ -71,16 +71,7 @@ const RecipeTableMobile:FC = () => {
     //         <th scope="col" className="p-3 text-base font-semibold tracking-wide text-left">Category</th>
 
     //         <th>
-    //             {deleteRecipe.isLoading
-    //             ? <button className="btn btn-square loading m-2 btn-sm"></button>
-    //             : <button className="btn btn-square btn-outline m-2 btn-sm"
-    //                     onClick={(event) => {
-    //                         event.preventDefault();
-    //                         deleteRecipe.mutate(Array.from(selected.keys()));
-    //                     }}>
-    //                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-    //             </button>
-    //             }
+    //            
                 
     //         </th>
     //     </tr>

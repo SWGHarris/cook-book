@@ -51,6 +51,7 @@ import { trpc } from "../utils/trpc";
 
 const CreateRecipe:FC = () => {
   const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
   const [steps, setSteps] = useState<string[]>([""]); // temp way until using form hook of some sort
   const ctx = trpc.useContext();
   const { data } = trpc.useQuery(["myself.me"]);
@@ -97,11 +98,11 @@ const CreateRecipe:FC = () => {
                 />
                 <textarea
                   className="bg-inherit resize-none border-gray-500 border-t-2 focus:outline-none pt-2"
-                  value={title}
+                  value={desc}
                   rows={3}
                   placeholder="Give an optional description"
                   maxLength={250}
-                  onChange={(event) => setTitle(event.target.value)}
+                  onChange={(event) => setDesc(event.target.value)}
                 />
                 {steps.map((step, index) =>
 

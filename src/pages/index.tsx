@@ -14,7 +14,9 @@ const Home = () => {
     <main className="flex flex-col items-center">
 
       <div className="pt-10">
-        {session && (
+        {session
+        
+        ? 
           <div>
             <h1>Welcome {session.user?.name}</h1>
             <div className="pt-3"></div>
@@ -26,7 +28,11 @@ const Home = () => {
               <RecipeTableMobile />
             </div>
           </div>
-        )}
+
+          : <Link href={'/sign-in'}>
+              <a className="btn p-2 rounded-md border-2 border-zinc-800 focus:outline-none">Sign In</a>
+            </Link>
+      }
       </div>
     </main>
   );

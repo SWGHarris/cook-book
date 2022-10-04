@@ -1,9 +1,26 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
 export const recipeRouter = createRouter()
+    .query("get", {
+        input: recipeSchema.pick({id:true}),
+        // TODO: trouble with output validation.
+        async resolve({ ctx, input }) {
+            try {
+                return await ctx.prisma.recipe.findUnique({
+                    where: {
+                        id: input.id
+                    },
+                    include: {
+                        steps: true
+                    }
+                });
+            } catch (error) {
+                console.log("error", error);
+            }
+        }
+    })
     .query("getAll", {
         output: recipeSchema.omit({steps: true}).array().optional(),
         async resolve({ ctx }) {
@@ -24,7 +41,6 @@ export const recipeRouter = createRouter()
             code: "UNAUTHORIZED",
             message: "Cannot edit recipe without logging in."
         })}
-
         return next();
     })
     .mutation("postRecipe", {
@@ -37,7 +53,8 @@ export const recipeRouter = createRouter()
                     data: {
                         title: input.title,
                         authorId: input.authorId,
-                    },
+                        desc: input.desc
+                    }
                 });
             } catch (error) {
                 throw new TRPCError({
@@ -47,22 +64,65 @@ export const recipeRouter = createRouter()
             }
         },
     })
+    .mutation("editRecipe", {
+        input: recipeSchema,
+        async resolve({ ctx, input }) {
+            if (ctx.session?.user.id !== input.authorId) {
+                throw new TRPCError({code: 'UNAUTHORIZED'})
+            };
+            const updateRecipeFields =  ctx.prisma.recipe.update({
+                where: {
+                    id: input.id
+                },
+                data: {
+                    title: input.title,
+                    authorId: input.authorId,
+                    desc: input.desc,
+                },
+            });
+
+            // const upsertRecipeSteps = !input.steps ? []
+            // : input.steps.map((s) => {
+            //     ctx.prisma.recipeStep.upsert({
+            //         where: {
+            //             id: s.id,
+            //         },
+            //         update: {
+            //             text: s.text,
+            //             title: s.title,
+            //             order: s.order,
+            //         },
+            //         create: {
+            //             recipeId: s.recipeId,
+            //             text: s.text,
+            //             title: s.title,
+            //             order: s.order,
+            //         },
+            //     })
+            // })
+
+            try {
+                return ctx.prisma.$transaction([updateRecipeFields]);
+            } catch (error) {
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: 'Something went wrong.'
+                })
+            };
+        }
+    })
     .mutation("postRecipeStep", {
         input: recipeStepSchema,
         async resolve({ ctx, input }) {
             try {
-                await ctx.prisma.recipe.update({
-                    where: { id: input.recipeId },
-                    data: {
-                        steps: {
-                            create: {
-                                stepNumber: input.stepNumber,
-                                title: input.title,
-                                text: input.text
-                            }
-                        }                    
-                    }
-                });
+                return await ctx.prisma.recipeStep.create({
+                        data: {
+                            recipeId: input.recipeId,
+                            order: input.order,
+                            title: input.title,
+                            text: input.text
+                        },
+                })
             } catch (error) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

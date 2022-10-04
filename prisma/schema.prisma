@@ -79,22 +79,22 @@ model VerificationToken {
 model Recipe {
     @@map("recipe")
 
-    id Int @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    title String
-    author User @relation(fields: [authorId], references: [id])
-    authorId String
-    desc    String?
-    steps RecipeStep[]
+    id          String    @id @default(cuid())
+    createdAt   DateTime @default(now())
+    title       String
+    author      User @relation(fields: [authorId], references: [id])
+    authorId    String
+    desc        String
+    steps       RecipeStep[]
 }
 
 model RecipeStep {
     @@map("recipe_step")
 
-    id Int @id @default(autoincrement())
-    recipe Recipe @relation(fields: [recipeId], references: [id])
-    recipeId Int
-    stepNumber Int
-    title String?
-    text String
+    id          String    @id @default(cuid())
+    recipe      Recipe @relation(fields: [recipeId], references: [id])
+    recipeId    String
+    order       Int
+    title       String?
+    text        String
 }

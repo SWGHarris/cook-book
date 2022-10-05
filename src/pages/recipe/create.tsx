@@ -5,19 +5,11 @@ import { FormEvent, useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
 
 const CreateRecipe: NextPage = () => {
-  const { data: session, status } = useSession();
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [submit, setSubmit] = useState(false);
-  const [recipeId, setRecipeId] = useState< string | undefined >(undefined);
-  const postRecipe = trpc.useMutation("recipes.postRecipe");
-  const router = useRouter();
-
-  useEffect(() => {
-    if (recipeId && submit) {
-      router.push({pathname: '/recipe/edit', query: {id : recipeId}})
-    };
-  },[submit]);
+    const { data: session, status } = useSession();
+    const [title, setTitle] = useState("");
+    const [desc, setDesc] = useState("");
+    const postRecipe = trpc.useMutation("recipes.postRecipe");
+    const router = useRouter();
 
     const handleSubmit = (authorId: string, event: FormEvent<HTMLFormElement>) => {
       console.log("onSubmit firing\n")
@@ -30,8 +22,7 @@ const CreateRecipe: NextPage = () => {
       {
         onSuccess: (data) => {
           console.log("onSuccess firing");
-          setRecipeId(data.id);
-          setSubmit(true);
+          router.push({pathname: '/recipe/edit', query: {id : data.id}});
         }
       });
     };

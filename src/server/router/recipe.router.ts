@@ -7,7 +7,6 @@ import { createRouter } from "./context";
 export const recipeRouter = createRouter()
     .query("get", {
         input: recipeSchema.pick({id:true}),
-        // TODO: trouble with output validation.
         async resolve({ ctx, input }) {
             try {
                 return await ctx.prisma.recipe.findUnique({

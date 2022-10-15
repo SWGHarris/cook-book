@@ -18,7 +18,6 @@ const SignInPage = () => {
                             Login with Discord
                         </button>
                     </div>
-                    //TODO: need a to redirect if session?
                 )}
                 
             </div>

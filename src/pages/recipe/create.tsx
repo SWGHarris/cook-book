@@ -61,7 +61,6 @@ const CreateRecipe: NextPage = () => {
                       className="p-2 bg-green-700 text-base font-bold focus:outline-none"
                       type="submit"
                     >
-                      {/* TODO: Continue button should first post recipe, then route to edit page using the new recipe id */}
                       Continue
                     </button>
                   </form>

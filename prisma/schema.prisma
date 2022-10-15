@@ -94,7 +94,6 @@ model RecipeStep {
     id          String    @id @default(cuid())
     recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     recipeId    String
-    order       Int
     title       String?
     text        String
 }

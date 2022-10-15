@@ -3,7 +3,7 @@ import { Recipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { trpc } from "../../utils/trpc";
 
 // const isValidRecipeId  = (id: any): id is string  => {
@@ -14,19 +14,24 @@ const EditRecipe: NextPage = () => {
   const [ recipe, setRecipe ] = useState<Recipe & {steps: RecipeStep[]}>();
   const { data: session, status } = useSession();
   const { id } = useRouter().query;
+  const editRecipe = trpc.useMutation("recipes.editRecipe");
   const recQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
     onSuccess: (data) => {
       if (data) setRecipe(data);
     },
     staleTime: Infinity
-    
   });
-  const editRecipe = trpc.useMutation("recipes.editRecipe");
 
-  // useEffect(() => {
-  //   if (recQuery.data) setRecipe(recQuery.data)
-  // }, [recQuery.data])
+  const handleSetStep = (stepText: string, index: number) => {
+    if (recipe) {
+      const steps_new = recipe.steps.map((s, i) => (i === index) ? {...s, text: stepText} : s );
+      setRecipe({...recipe, steps: steps_new});
+    }
+  }
 
+  const handleEditRecipe = () => {
+    if (recipe) editRecipe.mutate(recipe);
+  }
 
   if (status === "authenticated" && recQuery.isSuccess && recipe) {
     return(
@@ -35,16 +40,7 @@ const EditRecipe: NextPage = () => {
       <div className="pt-6 w-screen max-w-prose">
                 <form
                   className="flex flex-col gap-2"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    editRecipe.mutate({
-                      id: recipe.id,
-                      authorId: session.user.id,
-                      desc: recipe.desc,
-                      title: recipe.title,
-                      steps: recipe.steps
-                    });
-                  }}
+                  onSubmit={handleEditRecipe}
                 >
                   <div className=" bg-gray-700 flex flex-col p-2">
                   <textarea
@@ -68,17 +64,14 @@ const EditRecipe: NextPage = () => {
                     <div key={index}>
 
                     <textarea
-                    className="w-full bg-slate-600 p-2 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    key={index}
-                    minLength={1}
-                    maxLength={400}
-                    value={step.text}
-                    placeholder={"Step " + (index + 1)}
-                    onChange={(event) => {
-                      // event.preventDefault();
-                      setRecipe({...recipe, steps: recipe.steps.map((s, i) => (i === index) ? {...s, text: event.target.value} : s )});
-                    }} 
-                  />
+                      className="w-full bg-slate-600 p-2 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      key={index}
+                      minLength={1}
+                      maxLength={400}
+                      value={step.text}
+                      placeholder={"Step " + (index + 1)}
+                      onChange={(event) => handleSetStep(event.target.value, index)}
+                    />
                   </div>)}
                   </div>
                   
@@ -89,7 +82,6 @@ const EditRecipe: NextPage = () => {
                         id: "",
                         title: "", 
                         text: "",
-                        order: recipe.steps.length,
                         recipeId: recipe.id
                       };
                       setRecipe({...recipe, steps: [...recipe.steps, nextStep]})

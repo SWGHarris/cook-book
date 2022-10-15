@@ -32,8 +32,6 @@ const RecipeTableMobile:FC = () => {
             {deleteRecipe.isLoading
                 ? <button className="btn btn-square loading btn-xs"></button>
                 : <button className="btn btn-square btn-outline btn-xs"
-                        // TODO: need to prevent unselected from getting deleted (selected then unselected are still in list)
-                        // TODO: abstract out the handler for deleting(or other action)
                         onClick={(event) => {
                             event.preventDefault();
                             handleDelete();
@@ -56,7 +54,6 @@ const RecipeTableMobile:FC = () => {
                                 type="checkbox" 
                                 className="checkbox"
                                 onChange={() => handleSelection(recipe.id)}
-                                // onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))}}
                             />
                         </div>
                     </div>

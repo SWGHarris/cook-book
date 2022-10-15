@@ -68,6 +68,7 @@ export const recipeRouter = createRouter()
     .mutation("editRecipe", {
         input: recipeSchema,
         async resolve({ ctx, input }) {
+            console.log(input);
             if (ctx.session?.user.id !== input.authorId) {
                 throw new TRPCError({code: 'UNAUTHORIZED'})
             }
@@ -96,12 +97,10 @@ export const recipeRouter = createRouter()
                         create: {
                             recipeId: s.recipeId,
                             title: s.title,
-                            order: s.order,
                             text: s.text
                         },
                         update: {
                             title: s.title,
-                            order: s.order,
                             text: s.text
                         }
                     })

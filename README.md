@@ -1,6 +1,6 @@
 # Cook Book
 
-This is an app bootstrapped according to the [init.tips](https://init.tips) stack, also known as the T3-Stack.
+This is an app bootstrapped according to [init.tips](https://init.tips) using the T3 stack.
 
 cook-book is a Next.js app
 

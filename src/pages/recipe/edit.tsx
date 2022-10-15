@@ -29,6 +29,9 @@ const EditRecipe: NextPage = () => {
     }
   }
 
+  const handleEditRecipe = () => {
+    if (recipe) editRecipe.mutate(recipe);
+  }
 
   if (status === "authenticated" && recQuery.isSuccess && recipe) {
     return(
@@ -37,16 +40,7 @@ const EditRecipe: NextPage = () => {
       <div className="pt-6 w-screen max-w-prose">
                 <form
                   className="flex flex-col gap-2"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    editRecipe.mutate({
-                      id: recipe.id,
-                      authorId: session.user.id,
-                      desc: recipe.desc,
-                      title: recipe.title,
-                      steps: recipe.steps
-                    });
-                  }}
+                  onSubmit={handleEditRecipe}
                 >
                   <div className=" bg-gray-700 flex flex-col p-2">
                   <textarea
@@ -88,7 +82,6 @@ const EditRecipe: NextPage = () => {
                         id: "",
                         title: "", 
                         text: "",
-                        order: recipe.steps.length,
                         recipeId: recipe.id
                       };
                       setRecipe({...recipe, steps: [...recipe.steps, nextStep]})

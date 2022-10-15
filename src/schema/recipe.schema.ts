@@ -3,7 +3,6 @@ import { string, z } from "zod";
 export const recipeStepSchema = z.object({
     id: z.string(),
     recipeId: z.string(),
-    order: z.number().int().positive(),
     title: z.string().nullable(),
     text: string()
 })

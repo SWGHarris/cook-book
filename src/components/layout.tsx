@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FC } from "react";
 
 const Navbar: FC = () => {
-    const { data: session, status } = useSession();
+    const { data: session} = useSession();
     return (
         <div className="navbar bg-base-100">
             <div className="navbar-start">

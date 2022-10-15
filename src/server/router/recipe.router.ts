@@ -1,11 +1,30 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
+import { recipeSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
+
+
 export const recipeRouter = createRouter()
+    .query("get", {
+        input: recipeSchema.pick({id:true}),
+        // TODO: trouble with output validation.
+        async resolve({ ctx, input }) {
+            try {
+                return await ctx.prisma.recipe.findUnique({
+                    where: {
+                        id: input.id
+                    },
+                    include: {
+                        steps: true
+                    }
+                });
+            } catch (error) {
+                console.log("error", error);
+            }
+        }
+    })
     .query("getAll", {
-        output: recipeSchema.omit({steps: true}).array().optional(),
+        output: recipeSchema.array().optional(),
         async resolve({ ctx }) {
             try {
                 const r = await ctx.prisma.recipe.findMany({
@@ -24,7 +43,6 @@ export const recipeRouter = createRouter()
             code: "UNAUTHORIZED",
             message: "Cannot edit recipe without logging in."
         })}
-
         return next();
     })
     .mutation("postRecipe", {
@@ -37,30 +55,7 @@ export const recipeRouter = createRouter()
                     data: {
                         title: input.title,
                         authorId: input.authorId,
-                    },
-                });
-            } catch (error) {
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                    message: 'Something went wrong.'
-                })
-            }
-        },
-    })
-    .mutation("postRecipeStep", {
-        input: recipeStepSchema,
-        async resolve({ ctx, input }) {
-            try {
-                await ctx.prisma.recipe.update({
-                    where: { id: input.recipeId },
-                    data: {
-                        steps: {
-                            create: {
-                                stepNumber: input.stepNumber,
-                                title: input.title,
-                                text: input.text
-                            }
-                        }                    
+                        desc: input.desc
                     }
                 });
             } catch (error) {
@@ -70,6 +65,57 @@ export const recipeRouter = createRouter()
                 })
             }
         },
+    })
+    .mutation("editRecipe", {
+        input: recipeSchema,
+        async resolve({ ctx, input }) {
+            if (ctx.session?.user.id !== input.authorId) {
+                throw new TRPCError({code: 'UNAUTHORIZED'})
+            }
+            const updateRecipe =  ctx.prisma.recipe.update({
+                where: {
+                    id: input.id
+                },
+                data: {
+                    title: input.title,
+                    authorId: input.authorId,
+                    desc: input.desc,
+                    steps: {
+                        deleteMany: {
+                            id: { notIn: input.steps ? input.steps.map((s) => s.id) : [] }
+                        },
+                    }
+                },
+            });
+
+            const upsertSteps = !input.steps ? []
+                : input.steps.map((s) => 
+                    ctx.prisma.recipeStep.upsert({
+                        where: {
+                            id: s.id,
+                        },
+                        create: {
+                            recipeId: s.recipeId,
+                            title: s.title,
+                            order: s.order,
+                            text: s.text
+                        },
+                        update: {
+                            title: s.title,
+                            order: s.order,
+                            text: s.text
+                        }
+                    })
+                );
+            try {
+                return ctx.prisma.$transaction([updateRecipe,...upsertSteps]);
+            } catch (error) {
+                throw new TRPCError({
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: 'Something went wrong.'
+                })
+            }
+        }
     })
     .mutation("deleteRecipes", {
         input: recipeSchema.shape.id.array(),

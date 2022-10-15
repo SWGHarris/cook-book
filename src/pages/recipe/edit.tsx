@@ -3,7 +3,7 @@ import { Recipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { FC, useEffect, useState } from "react";
+import { useState } from "react";
 import { trpc } from "../../utils/trpc";
 
 // const isValidRecipeId  = (id: any): id is string  => {
@@ -14,12 +14,18 @@ const EditRecipe: NextPage = () => {
   const [ recipe, setRecipe ] = useState<Recipe & {steps: RecipeStep[]}>();
   const { data: session, status } = useSession();
   const { id } = useRouter().query;
-  const recQuery = trpc.useQuery(["recipes.get", { id: id as string }]);
-  const postRecipe = trpc.useMutation("recipes.postRecipe");
+  const recQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
+    onSuccess: (data) => {
+      if (data) setRecipe(data);
+    },
+    staleTime: Infinity
+    
+  });
+  const editRecipe = trpc.useMutation("recipes.editRecipe");
 
-  useEffect(() => {
-    if (recQuery.data) setRecipe(recQuery.data)
-  }, [recQuery.data])
+  // useEffect(() => {
+  //   if (recQuery.data) setRecipe(recQuery.data)
+  // }, [recQuery.data])
 
 
   if (status === "authenticated" && recQuery.isSuccess && recipe) {
@@ -31,10 +37,12 @@ const EditRecipe: NextPage = () => {
                   className="flex flex-col gap-2"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    postRecipe.mutate({
+                    editRecipe.mutate({
+                      id: recipe.id,
                       authorId: session.user.id,
-                      desc: "How to make the best dinner ever",
+                      desc: recipe.desc,
                       title: recipe.title,
+                      steps: recipe.steps
                     });
                   }}
                 >
@@ -67,7 +75,7 @@ const EditRecipe: NextPage = () => {
                     value={step.text}
                     placeholder={"Step " + (index + 1)}
                     onChange={(event) => {
-                      event.preventDefault();
+                      // event.preventDefault();
                       setRecipe({...recipe, steps: recipe.steps.map((s, i) => (i === index) ? {...s, text: event.target.value} : s )});
                     }} 
                   />
@@ -88,7 +96,7 @@ const EditRecipe: NextPage = () => {
                     }
                   }
                   >
-                    Add Step
+                    Add Another Step
                   </button>
                   <button
                     className="p-2 bg-green-700 text-base font-bold focus:outline-none"

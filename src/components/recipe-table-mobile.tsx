@@ -51,7 +51,12 @@ const RecipeTableMobile:FC = () => {
                         </div>
                     </div>
 
-                    <div className="text-sm font-medium text-gray-400 w-2/3">A very brief description that is about this long.</div>
+                    <div className="text-sm font-medium text-gray-400 w-2/3">{recipe.desc}</div>
+                    {recipe.steps &&
+                        recipe.steps.map((s => 
+                            <div className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>    
+                        ))
+                    }
                     <div className="flex gap-2">
                             <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>
                             <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-gray-200 bg-gray-200 rounded-lg bg-opacity-50">easy</div>

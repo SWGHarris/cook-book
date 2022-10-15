@@ -2,6 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
+
+
 export const recipeRouter = createRouter()
     .query("get", {
         input: recipeSchema.pick({id:true}),
@@ -22,7 +24,7 @@ export const recipeRouter = createRouter()
         }
     })
     .query("getAll", {
-        output: recipeSchema.omit({steps: true}).array().optional(),
+        output: recipeSchema.array().optional(),
         async resolve({ ctx }) {
             try {
                 const r = await ctx.prisma.recipe.findMany({
@@ -70,7 +72,7 @@ export const recipeRouter = createRouter()
             if (ctx.session?.user.id !== input.authorId) {
                 throw new TRPCError({code: 'UNAUTHORIZED'})
             };
-            const updateRecipeFields =  ctx.prisma.recipe.update({
+            const updateRecipe =  ctx.prisma.recipe.update({
                 where: {
                     id: input.id
                 },
@@ -78,31 +80,35 @@ export const recipeRouter = createRouter()
                     title: input.title,
                     authorId: input.authorId,
                     desc: input.desc,
+                    steps: {
+                        deleteMany: {
+                            id: { notIn: input.steps ? input.steps.map((s) => s.id) : [] }
+                        },
+                    }
                 },
             });
 
-            // const upsertRecipeSteps = !input.steps ? []
-            // : input.steps.map((s) => {
-            //     ctx.prisma.recipeStep.upsert({
-            //         where: {
-            //             id: s.id,
-            //         },
-            //         update: {
-            //             text: s.text,
-            //             title: s.title,
-            //             order: s.order,
-            //         },
-            //         create: {
-            //             recipeId: s.recipeId,
-            //             text: s.text,
-            //             title: s.title,
-            //             order: s.order,
-            //         },
-            //     })
-            // })
-
+            const upsertSteps = !input.steps ? []
+                : input.steps.map((s) => 
+                    ctx.prisma.recipeStep.upsert({
+                        where: {
+                            id: s.id,
+                        },
+                        create: {
+                            recipeId: s.recipeId,
+                            title: s.title,
+                            order: s.order,
+                            text: s.text
+                        },
+                        update: {
+                            title: s.title,
+                            order: s.order,
+                            text: s.text
+                        }
+                    })
+                );
             try {
-                return ctx.prisma.$transaction([updateRecipeFields]);
+                return ctx.prisma.$transaction([updateRecipe,...upsertSteps]);
             } catch (error) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',
@@ -110,26 +116,6 @@ export const recipeRouter = createRouter()
                 })
             };
         }
-    })
-    .mutation("postRecipeStep", {
-        input: recipeStepSchema,
-        async resolve({ ctx, input }) {
-            try {
-                return await ctx.prisma.recipeStep.create({
-                        data: {
-                            recipeId: input.recipeId,
-                            order: input.order,
-                            title: input.title,
-                            text: input.text
-                        },
-                })
-            } catch (error) {
-                throw new TRPCError({
-                    code: 'INTERNAL_SERVER_ERROR',
-                    message: 'Something went wrong.'
-                })
-            }
-        },
     })
     .mutation("deleteRecipes", {
         input: recipeSchema.shape.id.array(),

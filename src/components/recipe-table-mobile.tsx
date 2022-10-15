@@ -7,11 +7,22 @@ import { trpc } from "../utils/trpc";
 
 const RecipeTableMobile:FC = () => {
     const ctx = trpc.useContext();
-    const [selected, setSelected] = useState<Map<Recipe['id'],boolean>>(new Map());
+    const [selected, setSelected] = useState<Set<Recipe['id']>>(new Set());
     const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
     const deleteRecipe = trpc.useMutation(["recipes.deleteRecipes"], {
       onSuccess: () => ctx.invalidateQueries(["recipes.getAll"])
     });
+
+    const handleSelection = (recipeId : Recipe['id']) => {
+        const selected_new = selected;
+        if (selected.has(recipeId)) selected_new.delete(recipeId);
+        else selected_new.add(recipeId);
+        setSelected(selected_new);
+    }
+
+    const handleDelete = () => {
+        deleteRecipe.mutate(Array.from(selected));
+    }
 
     if (isLoading) return <div>Fetching recipes...</div>;
 
@@ -25,7 +36,7 @@ const RecipeTableMobile:FC = () => {
                         // TODO: abstract out the handler for deleting(or other action)
                         onClick={(event) => {
                             event.preventDefault();
-                            deleteRecipe.mutate(Array.from(selected.keys()));
+                            handleDelete();
                         }}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -37,16 +48,15 @@ const RecipeTableMobile:FC = () => {
                 <div key={index} className="bg-gray-800 space-y-1 p-3 rounded-lg shadow">
                     <div className="flex items-stretch space-x-2 text-sm">
                         <div className="font-bold text-sky-700 hover:underline"><Link href="" >{recipe.title}</Link></div>
-                        <div>Sam Harris</div>
+                        <div>Samuel Harris</div>
                         <div className="text-gray-500">9/12/2022</div>
                         <span className=" grow"></span>
                         <div>
                             <input 
                                 type="checkbox" 
-                                className="checkbox" 
-                                checked={selected.get(recipe.id)} 
-                                onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))
-                                }}
+                                className="checkbox"
+                                onChange={() => handleSelection(recipe.id)}
+                                // onChange={(event) => {setSelected(new Map(selected.set(recipe.id, event.target.checked)))}}
                             />
                         </div>
                     </div>

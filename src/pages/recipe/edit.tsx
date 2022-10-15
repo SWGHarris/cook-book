@@ -3,7 +3,7 @@ import { Recipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { trpc } from "../../utils/trpc";
 
 // const isValidRecipeId  = (id: any): id is string  => {
@@ -33,7 +33,11 @@ const EditRecipe: NextPage = () => {
     if (recipe) editRecipe.mutate(recipe);
   }
 
-  if (status === "authenticated" && recQuery.isSuccess && recipe) {
+  if (status === "authenticated" 
+        && recQuery.isSuccess
+        && recipe
+        && recipe.authorId === session.user.id) {
+
     return(
       <main className="flex flex-col items-center">
         <h1>{recipe.title}</h1>
@@ -59,20 +63,21 @@ const EditRecipe: NextPage = () => {
                     maxLength={250}
                     onChange={(event) => setRecipe({...recipe, desc: event.target.value })}
                   />
+
                   {recipe.steps.map((step, index) =>
-
                     <div key={index}>
-
-                    <textarea
-                      className="w-full bg-slate-600 p-2 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      key={index}
-                      minLength={1}
-                      maxLength={400}
-                      value={step.text}
-                      placeholder={"Step " + (index + 1)}
-                      onChange={(event) => handleSetStep(event.target.value, index)}
-                    />
-                  </div>)}
+                      <textarea
+                        className="w-full bg-slate-600 p-2 rounded-md resize-none border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        key={index}
+                        minLength={1}
+                        maxLength={400}
+                        value={step.text}
+                        placeholder={"Step " + (index + 1)}
+                        //TODO: should this be on blur?
+                        onChange={(event) => handleSetStep(event.target.value, index)}
+                      />
+                    </div>)}
+                  
                   </div>
                   
                   <button

@@ -30,6 +30,9 @@ export const recipeRouter = createRouter()
                     orderBy: {
                         createdAt: "desc",
                     },
+                    include: {
+                        steps: true
+                    }
                 });
                 return r;
             } catch (error) {

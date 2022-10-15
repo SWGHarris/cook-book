@@ -53,8 +53,8 @@ const RecipeTableMobile:FC = () => {
 
                     <div className="text-sm font-medium text-gray-400 w-2/3">{recipe.desc}</div>
                     {recipe.steps &&
-                        recipe.steps.map((s => 
-                            <div className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>    
+                        recipe.steps.map(((s,index) => 
+                            <div key={index} className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>    
                         ))
                     }
                     <div className="flex gap-2">

@@ -1,4 +1,4 @@
-import { string, z, ZodSchema } from "zod";
+import { string, z } from "zod";
 
 export const recipeStepSchema = z.object({
     id: z.string(),

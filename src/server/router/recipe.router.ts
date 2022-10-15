@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { recipeSchema, recipeStepSchema } from "../../schema/recipe.schema";
+import { recipeSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
 
@@ -71,7 +71,7 @@ export const recipeRouter = createRouter()
         async resolve({ ctx, input }) {
             if (ctx.session?.user.id !== input.authorId) {
                 throw new TRPCError({code: 'UNAUTHORIZED'})
-            };
+            }
             const updateRecipe =  ctx.prisma.recipe.update({
                 where: {
                     id: input.id
@@ -114,7 +114,7 @@ export const recipeRouter = createRouter()
                     code: 'INTERNAL_SERVER_ERROR',
                     message: 'Something went wrong.'
                 })
-            };
+            }
         }
     })
     .mutation("deleteRecipes", {

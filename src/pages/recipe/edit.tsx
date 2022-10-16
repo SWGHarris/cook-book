@@ -12,7 +12,7 @@ import { trpc } from "../../utils/trpc";
 
 const EditRecipe: NextPage = () => {
   const [ recipe, setRecipe ] = useState<Recipe & {steps: RecipeStep[]}>();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { id } = useRouter().query;
   const editRecipe = trpc.useMutation("recipes.editRecipe");
   const recQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
@@ -35,8 +35,7 @@ const EditRecipe: NextPage = () => {
 
   if (status === "authenticated" 
         && recQuery.isSuccess
-        && recipe
-        && recipe.authorId === session.user.id) {
+        && recipe) {
 
     return(
       <main className="flex flex-col items-center">
@@ -44,7 +43,9 @@ const EditRecipe: NextPage = () => {
       <div className="pt-6 w-screen max-w-prose">
                 <form
                   className="flex flex-col gap-2"
-                  onSubmit={handleEditRecipe}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    handleEditRecipe();}}
                 >
                   <div className=" bg-gray-700 flex flex-col p-2">
                   <textarea
@@ -74,7 +75,9 @@ const EditRecipe: NextPage = () => {
                         value={step.text}
                         placeholder={"Step " + (index + 1)}
                         //TODO: should this be on blur?
-                        onChange={(event) => handleSetStep(event.target.value, index)}
+                        onChange={(event) => {
+                          event.preventDefault();
+                          handleSetStep(event.target.value, index)}}
                       />
                     </div>)}
                   

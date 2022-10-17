@@ -12,7 +12,7 @@ import { trpc } from "../../utils/trpc";
 
 const EditRecipe: NextPage = () => {
   const [ recipe, setRecipe ] = useState<Recipe & {steps: RecipeStep[]}>();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const { id } = useRouter().query;
   const editRecipe = trpc.useMutation("recipes.editRecipe");
   const recQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
@@ -35,7 +35,8 @@ const EditRecipe: NextPage = () => {
 
   if (status === "authenticated" 
         && recQuery.isSuccess
-        && recipe) {
+        && recipe
+        && recipe.authorId === session.user.id) {
 
     return(
       <main className="flex flex-col items-center">

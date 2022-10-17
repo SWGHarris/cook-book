@@ -4,25 +4,37 @@ import { FC, useState } from "react";
 import { Recipe } from "../schema/recipe.schema";
 import { trpc } from "../utils/trpc";
 
+interface selectionMap {
+    id: Recipe['id'],
+    value: boolean,
+}
 
 const RecipeTableMobile:FC = () => {
     const ctx = trpc.useContext();
-    const [selected, setSelected] = useState<Set<Recipe['id']>>(new Set());
+    const [selected, setSelected] = useState<selectionMap[]>([]);
     const { data: recipes, isLoading } = trpc.useQuery(["recipes.getAll"]);
     const deleteRecipe = trpc.useMutation(["recipes.deleteRecipes"], {
-      onSuccess: () => ctx.invalidateQueries(["recipes.getAll"])
+      onSuccess: () => {
+        ctx.invalidateQueries(["recipes.getAll"]);
+        setSelected([]);
+      }
     });
 
-    const handleSelection = (recipeId : Recipe['id']) => {
-        const selected_new = selected;
-        if (selected.has(recipeId)) selected_new.delete(recipeId);
-        else selected_new.add(recipeId);
-        setSelected(selected_new);
-    }
+    const handleSelection = (index: number, recipeId: Recipe['id']) => {
+        const selectedNew = [...selected];
+        const selection = selectedNew[index];
+        if (selection)
+            selectedNew[index] = {id: selection.id, value: !selection.value};
+        else
+            selectedNew[index] = {id: recipeId, value: true};
+        setSelected(selectedNew);
+    };
 
     const handleDelete = () => {
-        deleteRecipe.mutate(Array.from(selected));
-    }
+        const recipesToDelete = selected.filter(x => (x !== undefined) && (x.value === true))
+                                        .map((x) =>  x.id);
+        deleteRecipe.mutate(recipesToDelete);
+    };
 
     if (isLoading) return <div>Fetching recipes...</div>;
 
@@ -42,6 +54,7 @@ const RecipeTableMobile:FC = () => {
             </div>
             <div className="p-1"></div>
             <div className="grid grid-cols-1 gap-1">
+
             {recipes?.map((recipe, index) => 
                 <div key={index} className="bg-gray-800 space-y-1 p-3 rounded-lg shadow">
                     <div className="flex items-stretch space-x-2 text-sm">
@@ -53,23 +66,21 @@ const RecipeTableMobile:FC = () => {
                             <input 
                                 type="checkbox" 
                                 className="checkbox"
-                                onChange={() => handleSelection(recipe.id)}
+                                checked={selected[index]?.value}
+                                onChange={() => handleSelection(index, recipe.id)}
                             />
                         </div>
                     </div>
 
                     <div className="text-sm font-medium text-gray-400 w-2/3">{recipe.desc}</div>
-                    {recipe.steps &&
-                        recipe.steps.map(((s,index) => 
-                            <div key={index} className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>    
-                        ))
-                    }
+                    {recipe.steps && recipe.steps.map(((s,index) => <div key={index} className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>))}
                     <div className="flex gap-2">
-                            <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>
-                            <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-gray-200 bg-gray-200 rounded-lg bg-opacity-50">easy</div>
+                        <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>
+                        <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-gray-200 bg-gray-200 rounded-lg bg-opacity-50">easy</div>
                     </div>
                 </div>
-            )}                    
+            )}
+
             </div>
         </div>
 )}

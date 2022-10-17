@@ -2,8 +2,6 @@ import { TRPCError } from "@trpc/server";
 import { recipeSchema } from "../../schema/recipe.schema";
 import { createRouter } from "./context";
 
-
-
 export const recipeRouter = createRouter()
     .query("get", {
         input: recipeSchema.pick({id:true}),
@@ -99,6 +97,7 @@ export const recipeRouter = createRouter()
                         },
                         create: {
                             recipeId: s.recipeId,
+                            order: s.order,
                             title: s.title,
                             text: s.text
                         },
@@ -121,6 +120,7 @@ export const recipeRouter = createRouter()
     .mutation("deleteRecipes", {
         input: recipeSchema.shape.id.array(),
         async resolve({ ctx, input }) {
+            // TODO: shouldn't be a problem to remove this since ondelete=>cascade
             const deleteSteps = ctx.prisma.recipeStep.deleteMany({
                 where: {
                     recipeId: {

@@ -89,6 +89,7 @@ const EditRecipe: NextPage = () => {
                     onClick={() => {
                       const nextStep: RecipeStep = {
                         id: "",
+                        order: recipe.steps.length,
                         title: "", 
                         text: "",
                         recipeId: recipe.id

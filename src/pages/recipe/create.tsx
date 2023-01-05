@@ -31,7 +31,7 @@ const CreateRecipe: NextPage = () => {
     if (status === "authenticated") {
       return(
         <main className="flex flex-col items-center">
-          <h1>Giver your recipe a title</h1>
+          <h2>Give your recipe a title</h2>
         <div className="pt-6 w-screen max-w-prose">
                   <form
                     className="flex flex-col gap-2"
@@ -43,7 +43,7 @@ const CreateRecipe: NextPage = () => {
                       value={title}
                       rows={1}
                       required
-                      placeholder="Give your recipe a title..."
+                      placeholder="Recipe Name"
                       maxLength={60}
                       onChange={(event) => setTitle(event.target.value)}
                     />

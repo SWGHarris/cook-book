@@ -14,6 +14,7 @@ export const recipeSchema = z.object({
     id : z.string(),
     title: z.string(),
     authorId: z.string(),
+    private: z.boolean(),
     desc: z.string(),
     steps: recipeStepSchema.array().optional()
 })

@@ -58,7 +58,7 @@ const RecipeTableMobile:FC = () => {
             {recipes?.map((recipe, index) => 
                 <div key={index} className="bg-gray-800 space-y-1 p-3 rounded-lg shadow">
                     <div className="flex items-stretch space-x-2 text-sm">
-                        <div className="font-bold text-sky-700 hover:underline"><Link href="" >{recipe.title}</Link></div>
+                        <div className="font-bold text-sky-700 hover:underline"><Link href={{pathname: "recipe/view", query: {id: recipe.id}}} >{recipe.title}</Link></div>
                         <div>Samuel Harris</div>
                         <div className="text-gray-500">9/12/2022</div>
                         <span className=" grow"></span>
@@ -72,12 +72,12 @@ const RecipeTableMobile:FC = () => {
                         </div>
                     </div>
 
-                    <div className="text-sm font-medium text-gray-400 w-2/3">{recipe.desc}</div>
-                    {recipe.steps && recipe.steps.map(((s,index) => <div key={index} className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>))}
+                    {/* <div className="text-sm font-medium text-gray-400 w-2/3">{recipe.desc}</div> */}
+                    {/* {recipe.steps && recipe.steps.map(((s,index) => <div key={index} className="text-sm font-medium text-gray-400 w-2/3">{s.text}</div>))}
                     <div className="flex gap-2">
                         <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-200 bg-yellow-200 rounded-lg bg-opacity-50">baking</div>
                         <div className="p-1.5 text-xs font-medium uppercase tracking-wider text-gray-200 bg-gray-200 rounded-lg bg-opacity-50">easy</div>
-                    </div>
+                    </div> */}
                 </div>
             )}
 

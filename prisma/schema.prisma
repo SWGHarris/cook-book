@@ -75,7 +75,7 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-// recipe models
+// recipe relations
 model Recipe {
     @@map("recipe")
 
@@ -84,6 +84,7 @@ model Recipe {
     title       String
     author      User @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     authorId    String
+    private     Boolean
     desc        String
     steps       RecipeStep[]
 }

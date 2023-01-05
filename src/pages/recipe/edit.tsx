@@ -15,7 +15,7 @@ const EditRecipe: NextPage = () => {
   const { data: session, status } = useSession();
   const { id } = useRouter().query;
   const editRecipe = trpc.useMutation("recipes.editRecipe");
-  const recQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
+  const recipeQuery = trpc.useQuery(["recipes.get", { id: id as string }], {
     onSuccess: (data) => {
       if (data) setRecipe(data);
     },
@@ -34,7 +34,7 @@ const EditRecipe: NextPage = () => {
   }
 
   if (status === "authenticated" 
-        && recQuery.isSuccess
+        && recipeQuery.isSuccess
         && recipe
         && recipe.authorId === session.user.id) {
 
@@ -110,7 +110,7 @@ const EditRecipe: NextPage = () => {
           </div>
         </main>
     );
-  } else if (recQuery.isLoading) {
+  } else if (recipeQuery.isLoading) {
     return <>Loading page</>
   } else {
     return <>Something went wrong</>

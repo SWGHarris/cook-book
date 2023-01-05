@@ -41,7 +41,7 @@ export const recipeRouter = createRouter()
     .middleware(async ({ctx, next}) => {
         if (!ctx.session) { throw new TRPCError({
             code: "UNAUTHORIZED",
-            message: "Cannot edit recipe without logging in."
+            message: "authorization required"
         })}
         return next();
     })
@@ -55,6 +55,7 @@ export const recipeRouter = createRouter()
                     data: {
                         title: input.title,
                         authorId: input.authorId,
+                        private: input.private,
                         desc: input.desc
                     }
                 });

@@ -18,11 +18,11 @@ const Home = () => {
         ? 
           <div>
             <h1>Welcome {session.user?.name}</h1>
-            <div className="pt-3"></div>
-            <Link href={'/recipe/create'}>
+            {/* <div className="pt-3"></div> */}
+            {/* <Link href={'/recipe/create'}>
                 <a className="btn p-2 rounded-md border-2 border-zinc-800 focus:outline-none">Create Recipe</a>
-            </Link>
-            <div className="pt-3"></div>
+            </Link> */}
+            {/* <div className="pt-3"></div> */}
             <div className="pt-8">
               <RecipeTableMobile />
             </div>

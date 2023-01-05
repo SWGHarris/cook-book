@@ -16,6 +16,7 @@ const CreateRecipe: NextPage = () => {
       event.preventDefault();
       postRecipe.mutate({
         authorId: authorId,
+        private: false,
         title: title,
         desc: desc
       },

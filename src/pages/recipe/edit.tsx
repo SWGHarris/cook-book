@@ -2,7 +2,7 @@ import { Recipe, RecipeIngredientOnRecipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { trpc } from "../../utils/trpc";
 
 // const isValidRecipeId  = (id: any): id is string  => {
@@ -14,8 +14,28 @@ interface EditRecipe extends Recipe {
   steps: RecipeStep[];
 }
 
+const useAutosizeTextArea = (
+  textAreaRef: HTMLTextAreaElement | null,
+  value: string
+) => {
+  useEffect(() => {
+    if (textAreaRef) {
+      // We need to reset the height momentarily to get the correct scrollHeight for the textarea
+      textAreaRef.style.height = "0px";
+      const scrollHeight = textAreaRef.scrollHeight;
+
+      // We then set the height directly, outside of the render loop
+      // Trying to set this with state or a ref will product an incorrect value.
+      textAreaRef.style.height = scrollHeight + "px";
+    }
+  }, [textAreaRef, value]);
+};
+
 const EditRecipe: NextPage = () => {
   const [recipe, setRecipe] = useState<EditRecipe>();
+  const [value, setValue] = useState("");
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  useAutosizeTextArea(textAreaRef.current, value);
   const { data: session, status } = useSession();
   const { id } = useRouter().query;
   const editRecipe = trpc.useMutation("recipes.editRecipe");
@@ -75,22 +95,24 @@ const EditRecipe: NextPage = () => {
           >
             <div className="flex flex-col p-2">
               <textarea
-                className="bg-inherit resize-none text-center border-gray-500 border-t-2 focus:outline-none pt-2"
+                className="bg-inherit p-2 resize-none overflow-y-hidden border-gray-500 border-t-2 border-b-2 focus:outline-none"
                 value={recipe.desc}
-                rows={3}
-                placeholder="Give an optional description"
+                rows={1}
+                placeholder="Give your recipe a description"
                 maxLength={250}
-                onChange={(event) =>
-                  setRecipe({ ...recipe, desc: event.target.value })
-                }
+                ref={textAreaRef}
+                onChange={event => {
+                  setRecipe({ ...recipe, desc: event.target.value });
+                  setValue(event.target.value);
+                }}
               />
 
-              <h3 className="border-b-2 pb-1 border-gray-500">Ingredients</h3>
+              <h3 className="border-b-2 pb-1 border-gray-500">Ingredient List</h3>
               {recipe.ingredients.map((ingredient, index) => (
                 <div key={index}>
-                  <textarea
-                    // type="text"
-                    className="w-full bg-inherit ml-4 dark:focus:ring-blue-500 "
+                  <input
+                    type="text"
+                    className="w-full bg-inherit ml-4 pt-1 dark:focus:ring-blue-500 "
                     key={index}
                     minLength={1}
                     maxLength={50}
@@ -107,7 +129,7 @@ const EditRecipe: NextPage = () => {
 
               <button
                 type="button"
-                className="btn btn-outline font-bold"
+                className="btn btn-outline btn-sm m-1 font-bold"
                 onClick={() => {
                   const nextIngredient: RecipeIngredientOnRecipe = {
                     name: "",
@@ -128,6 +150,7 @@ const EditRecipe: NextPage = () => {
               <div className="p-1"></div>
               {recipe.steps.map((step, index) => (
                 <div key={index}>
+                  <label className="bg-inherit resize-none border-gray-500focus:outline-none p-1">{"Step " + (index+1)}</label>
                   <textarea
                     className="w-full bg-gray-800 overflow-hidden p-2 rounded-lg resize-y border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 max-h-16"
                     key={index}
@@ -147,7 +170,7 @@ const EditRecipe: NextPage = () => {
               <div className="p-1"></div>
               <button
                 type="button"
-                className="btn btn-outline font-bold"
+                className="btn btn-outline btn-sm font-bold"
                 onClick={() => {
                   const nextStep: RecipeStep = {
                     id: "",

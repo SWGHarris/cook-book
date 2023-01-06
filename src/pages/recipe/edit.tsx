@@ -8,11 +8,11 @@ import { trpc } from "../../utils/trpc";
 // const isValidRecipeId  = (id: any): id is string  => {
 //   return typeof id === "string";
 // }
- 
+
 interface EditRecipe extends Recipe {
-  ingredients: RecipeIngredientOnRecipe[],
-  steps: RecipeStep[]
-};
+  ingredients: RecipeIngredientOnRecipe[];
+  steps: RecipeStep[];
+}
 
 const EditRecipe: NextPage = () => {
   const [recipe, setRecipe] = useState<EditRecipe>();
@@ -28,8 +28,8 @@ const EditRecipe: NextPage = () => {
 
   const handleSetIngredient = (ingredientName: string, index: number) => {
     if (recipe) {
-      const ingredientsNew = recipe.ingredients.map((ingredient, i) => 
-        i === index ? {...ingredient, name: ingredientName} : ingredient
+      const ingredientsNew = recipe.ingredients.map((ingredient, i) =>
+        i === index ? { ...ingredient, name: ingredientName } : ingredient
       );
       setRecipe({ ...recipe, ingredients: ingredientsNew });
     }
@@ -115,9 +115,12 @@ const EditRecipe: NextPage = () => {
                     quantity: null,
                     unit: "NONE",
                     description: null,
-                    order: recipe.ingredients.length
+                    order: recipe.ingredients.length,
                   };
-                  setRecipe({...recipe, ingredients: [...recipe.ingredients, nextIngredient]});
+                  setRecipe({
+                    ...recipe,
+                    ingredients: [...recipe.ingredients, nextIngredient],
+                  });
                 }}
               >
                 add ingredient

@@ -12,7 +12,8 @@ export const recipeRouter = createRouter()
                         id: input.id
                     },
                     include: {
-                        steps: true
+                        steps: true,
+                        ingredients: true
                     }
                 });
             } catch (error) {
@@ -108,8 +109,28 @@ export const recipeRouter = createRouter()
                         }
                     })
                 );
+            const upsertIngredients = !input.ingredients ? []
+                : input.ingredients.map((ingredient) => 
+                    ctx.prisma.recipeIngredientOnRecipe.upsert({
+                        where: {
+                            recipeId_name: {
+                                recipeId: ingredient.recipeId,
+                                name: ingredient.name
+                            },
+                        },
+                        create: {
+                            recipeId: ingredient.recipeId,
+                            name: ingredient.name,
+                            order: ingredient.order,
+                        },
+                        update: {
+                            name: ingredient.name,
+                            order: ingredient.order
+                        }
+                    })
+                );
             try {
-                return ctx.prisma.$transaction([updateRecipe,...upsertSteps]);
+                return ctx.prisma.$transaction([updateRecipe,...upsertSteps,...upsertIngredients]);
             } catch (error) {
                 throw new TRPCError({
                     code: 'INTERNAL_SERVER_ERROR',

@@ -120,11 +120,12 @@ model RecipeIngredientOnRecipe {
 
     recipe Recipe           @relation(fields: [recipeId], references: [id])
     recipeId String
-    ingredientRel RecipeIngredient @relation(fields: [ingredient], references: [name])
-    ingredient String
+    ingredient RecipeIngredient @relation(fields: [name], references: [name])
+    name String
     quantity Int?
     unit IngredientUnit @default(NONE)
     description String?
+    order Int
 
-    @@id([recipeId, ingredient])
+    @@id([recipeId, name])
 }

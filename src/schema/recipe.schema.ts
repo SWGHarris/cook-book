@@ -1,3 +1,4 @@
+import { IngredientUnit } from "@prisma/client";
 import { string, z } from "zod";
 
 export const recipeStepSchema = z.object({
@@ -8,10 +9,20 @@ export const recipeStepSchema = z.object({
     text: string()
 })
 
+const units : string[] = [];
+for (const unit in IngredientUnit) {
+    units.push(unit);
+}
+
+export const IngredientUnitArray = units;
+
+
 export const recipeIngredientSchema = z.object({
     recipeId: z.string(),
     order: z.number().int().nonnegative(),
     name: z.string(),
+    unit: z.nativeEnum(IngredientUnit),
+    quantity: z.number().nonnegative().nullable()
 })
 
 

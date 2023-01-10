@@ -1,8 +1,9 @@
-import { Recipe, RecipeIngredientOnRecipe, RecipeStep } from "@prisma/client";
+import { IngredientUnit, Recipe, RecipeIngredientOnRecipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
+import { IngredientUnitArray } from "../../schema/recipe.schema";
 import { trpc } from "../../utils/trpc";
 
 // const isValidRecipeId  = (id: any): id is string  => {
@@ -14,6 +15,7 @@ interface EditRecipe extends Recipe {
   steps: RecipeStep[];
 }
 
+// TODO: extract to a component
 const useAutosizeTextArea = (
   textAreaRef: HTMLTextAreaElement | null,
   value: string
@@ -46,16 +48,20 @@ const EditRecipe: NextPage = () => {
     staleTime: Infinity,
   });
 
-  const handleSetIngredient = (ingredientName: string, index: number) => {
+  const handleIngredientChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    index: number
+  ) => {
+    const { name, value } = event.target;
     if (recipe) {
       const ingredientsNew = recipe.ingredients.map((ingredient, i) =>
-        i === index ? { ...ingredient, name: ingredientName } : ingredient
+        i === index ? { ...ingredient, [name]: value } : ingredient
       );
       setRecipe({ ...recipe, ingredients: ingredientsNew });
     }
   };
 
-  const handleSetStep = (stepText: string, index: number) => {
+  const handleStepChange = (stepText: string, index: number) => {
     if (recipe) {
       const stepsNew = recipe.steps.map((s, i) =>
         i === index ? { ...s, text: stepText } : s
@@ -64,7 +70,7 @@ const EditRecipe: NextPage = () => {
     }
   };
 
-  const handleEditRecipe = () => {
+  const handleSubmitSaveRecipe = () => {
     if (recipe) editRecipe.mutate(recipe);
   };
 
@@ -90,7 +96,7 @@ const EditRecipe: NextPage = () => {
             className="flex flex-col gap-2"
             onSubmit={(event) => {
               event.preventDefault();
-              handleEditRecipe();
+              handleSubmitSaveRecipe();
             }}
           >
             <div className="flex flex-col p-2">
@@ -101,40 +107,71 @@ const EditRecipe: NextPage = () => {
                 placeholder="Give your recipe a description"
                 maxLength={250}
                 ref={textAreaRef}
-                onChange={event => {
+                onChange={(event) => {
                   setRecipe({ ...recipe, desc: event.target.value });
                   setValue(event.target.value);
                 }}
               />
 
-              <h3 className="border-b-2 pb-1 border-gray-500">Ingredient List</h3>
+              <h3 className="text-center border-b-2 pb-1 pt-2 border-gray-500">
+                Ingredient List
+              </h3>
               {recipe.ingredients.map((ingredient, index) => (
-                <div key={index}>
-                  <input
-                    type="text"
-                    className="w-full bg-inherit ml-4 pt-1 dark:focus:ring-blue-500 "
-                    key={index}
-                    minLength={1}
-                    maxLength={50}
-                    placeholder={"--"}
-                    value={ingredient.name}
-                    //TODO: should this be on blur?
-                    onChange={(event) => {
-                      event.preventDefault();
-                      handleSetIngredient(event.target.value, index);
-                    }}
-                  />
+                <div className="flex flex-row" key={index}>
+                  <form id="ingredientForm">
+                    <input
+                      type="text"
+                      name="name"
+                      className="text-center bg-inherit ml-2 pt-1 dark:focus:ring-blue-500 "
+                      key={index}
+                      minLength={1}
+                      maxLength={80}
+                      placeholder={"--"}
+                      value={ingredient.name}
+                      //TODO: should this be on blur?
+                      onChange={(event) => {
+                        event.preventDefault();
+                        handleIngredientChange(event, index);
+                      }}
+                    />
+                    <input
+                      type="number"
+                      name="quantity"
+                      step={0.01}
+                      placeholder="0"
+                      min={0}
+                      max={10000000}
+                      className="bg-inherit"
+                      onChange={(event) => {
+                        event.preventDefault();
+                        handleIngredientChange(event, index);
+                      }}
+                    />
+                    <select
+                      name="unit"
+                      id="unit"
+                      className="bg-inherit"
+                      onChange={(event) => {
+                        event.preventDefault();
+                        handleIngredientChange(event, index);
+                      }}
+                    >
+                      {IngredientUnitArray.map((unit, index) => (
+                        <option key={index} value={unit}>{unit}</option>
+                      ))}
+                    </select>
+                  </form>
                 </div>
               ))}
 
               <button
                 type="button"
-                className="btn btn-outline btn-sm m-1 font-bold"
+                className="btn btn-outline btn-sm mt-2 font-bold"
                 onClick={() => {
                   const nextIngredient: RecipeIngredientOnRecipe = {
                     name: "",
                     recipeId: recipe.id,
-                    quantity: null,
+                    quantity: 0,
                     unit: "NONE",
                     description: null,
                     order: recipe.ingredients.length,
@@ -150,7 +187,9 @@ const EditRecipe: NextPage = () => {
               <div className="p-1"></div>
               {recipe.steps.map((step, index) => (
                 <div key={index}>
-                  <label className="bg-inherit resize-none border-gray-500focus:outline-none p-1">{"Step " + (index+1)}</label>
+                  <label className="bg-inherit resize-none border-gray-500focus:outline-none p-1">
+                    {"Step " + (index + 1)}
+                  </label>
                   <textarea
                     className="w-full bg-gray-800 overflow-hidden p-2 rounded-lg resize-y border-gray-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 max-h-16"
                     key={index}
@@ -162,7 +201,7 @@ const EditRecipe: NextPage = () => {
                     //TODO: should this be on blur?
                     onChange={(event) => {
                       event.preventDefault();
-                      handleSetStep(event.target.value, index);
+                      handleStepChange(event.target.value, index);
                     }}
                   />
                 </div>

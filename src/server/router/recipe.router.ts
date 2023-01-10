@@ -130,28 +130,44 @@ export const recipeRouter = createRouter()
         : input.ingredients.map((ingredient) =>
             ctx.prisma.recipeIngredientOnRecipe.upsert({
               where: {
-                recipeId_name: {
+                recipeId_order: {
                   recipeId: ingredient.recipeId,
-                  name: ingredient.name,
+                  order: ingredient.order,
                 },
               },
               create: {
                 recipeId: ingredient.recipeId,
                 name: ingredient.name,
                 order: ingredient.order,
+                quantity: ingredient.quantity,
+                unit: ingredient.unit
               },
               update: {
                 name: ingredient.name,
                 order: ingredient.order,
+                quantity: ingredient.quantity,
+                unit: ingredient.unit
               },
             })
           );
+      const deleteOldIngredientsOnRecipe = ctx.prisma.recipeIngredientOnRecipe.deleteMany({
+        where: {
+            recipeId: input.id,
+            order: {
+                notIn: input.ingredients?.map(ingredient => ingredient.order)
+            },
+            name: {
+                notIn: input.ingredients?.map(ingredient => ingredient.name)
+            }
+        }
+      })
       try {
         return ctx.prisma.$transaction([
           updateRecipe,
           ...upsertSteps,
           ...upsertIngredients,
           ...upsertIngredientsOnRecipe,
+          deleteOldIngredientsOnRecipe
         ]);
       } catch (error) {
         throw new TRPCError({

@@ -109,6 +109,7 @@ model RecipeIngredient {
 
 enum IngredientUnit {
     NONE
+    COUNT
     GRAMS   // mass
     CCS     // volume
     PINCH
@@ -125,7 +126,7 @@ model RecipeIngredientOnRecipe {
     quantity Int?
     unit IngredientUnit @default(NONE)
     description String?
-    order Int
+    order Int // order chosen by user
 
-    @@id([recipeId, name])
+    @@id([recipeId, order])
 }

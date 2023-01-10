@@ -1,8 +1,9 @@
-import { IngredientUnit, Recipe, RecipeIngredientOnRecipe, RecipeStep } from "@prisma/client";
+import { Recipe, RecipeIngredientOnRecipe, RecipeStep } from "@prisma/client";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
+import { string } from "zod";
 import { IngredientUnitArray } from "../../schema/recipe.schema";
 import { trpc } from "../../utils/trpc";
 
@@ -54,8 +55,10 @@ const EditRecipe: NextPage = () => {
   ) => {
     const { name, value } = event.target;
     if (recipe) {
+      const parsedValue: unknown =
+        event.target.type === "number" ? Number(Number(value).toFixed(3)) : value;
       const ingredientsNew = recipe.ingredients.map((ingredient, i) =>
-        i === index ? { ...ingredient, [name]: value } : ingredient
+        i === index ? { ...ingredient, [name]: parsedValue } : ingredient
       );
       setRecipe({ ...recipe, ingredients: ingredientsNew });
     }
@@ -137,7 +140,7 @@ const EditRecipe: NextPage = () => {
                     <input
                       type="number"
                       name="quantity"
-                      step={0.01}
+                      step={0.001}
                       placeholder="0"
                       min={0}
                       max={10000000}
@@ -157,7 +160,9 @@ const EditRecipe: NextPage = () => {
                       }}
                     >
                       {IngredientUnitArray.map((unit, index) => (
-                        <option key={index} value={unit}>{unit}</option>
+                        <option key={index} value={unit}>
+                          {unit}
+                        </option>
                       ))}
                     </select>
                   </form>

@@ -123,7 +123,7 @@ model RecipeIngredientOnRecipe {
     recipeId String
     ingredient RecipeIngredient @relation(fields: [name], references: [name])
     name String
-    quantity Int?
+    quantity Float?
     unit IngredientUnit @default(NONE)
     description String?
     order Int // order chosen by user

@@ -141,6 +141,7 @@ const EditRecipe: NextPage = () => {
                       type="number"
                       name="quantity"
                       step={0.001}
+                      value={ingredient.quantity || undefined}
                       placeholder="0"
                       min={0}
                       max={10000000}
@@ -153,6 +154,7 @@ const EditRecipe: NextPage = () => {
                     <select
                       name="unit"
                       id="unit"
+                      value={ingredient.unit}
                       className="bg-inherit"
                       onChange={(event) => {
                         event.preventDefault();
@@ -176,7 +178,7 @@ const EditRecipe: NextPage = () => {
                   const nextIngredient: RecipeIngredientOnRecipe = {
                     name: "",
                     recipeId: recipe.id,
-                    quantity: 0,
+                    quantity: null,
                     unit: "NONE",
                     description: null,
                     order: recipe.ingredients.length,

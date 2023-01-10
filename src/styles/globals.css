@@ -9,7 +9,11 @@
   h2 {
     @apply text-2xl;
   }
+  h3 {
+    @apply text-xl
+  }
 }
+
 /* body {
     @apply bg-neutral-900 text-neutral-100
   } */

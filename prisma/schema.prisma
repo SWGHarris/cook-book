@@ -75,28 +75,58 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-// recipe relations
 model Recipe {
     @@map("recipe")
 
-    id          String    @id @default(cuid())
-    createdAt   DateTime @default(now())
+    id          String      @id @default(cuid())
+    createdAt   DateTime    @default(now())
     title       String
-    author      User @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     authorId    String
     private     Boolean
     desc        String
+    ingredients RecipeIngredientOnRecipe[]
     steps       RecipeStep[]
 }
 
 model RecipeStep {
     @@map("recipe_step")
 
-    id          String    @id @default(cuid())
-    recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    id          String      @id @default(cuid())
+    recipe      Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     recipeId    String
-    // may want order to be a unique constraint along with id to ensure no step has the same order.
     order       Int
     title       String?
     text        String
+}
+
+model RecipeIngredient {
+    @@map("recipe_ingredient")    
+    
+    name String             @id
+    recipe RecipeIngredientOnRecipe[]
+}
+
+enum IngredientUnit {
+    NONE
+    COUNT
+    GRAMS   // mass
+    CCS     // volume
+    PINCH
+    DROP
+}
+
+model RecipeIngredientOnRecipe {
+    @@map("recipe_ingredient_on_recipe")
+
+    recipe Recipe           @relation(fields: [recipeId], references: [id])
+    recipeId String
+    ingredient RecipeIngredient @relation(fields: [name], references: [name])
+    name String
+    quantity Float?
+    unit IngredientUnit @default(NONE)
+    description String?
+    order Int // order chosen by user
+
+    @@id([recipeId, order])
 }
